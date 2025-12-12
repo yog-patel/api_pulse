@@ -11,7 +11,7 @@ const supabase = createClient(
 );
 
 export default function Dashboard() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
@@ -159,6 +159,12 @@ export default function Dashboard() {
           </Link>
           <div className="space-x-4">
             <span className="text-gray-600">{user?.email}</span>
+            <Link
+              href="/dashboard/settings"
+              className="text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              Settings
+            </Link>
             <button
               onClick={handleLogout}
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
