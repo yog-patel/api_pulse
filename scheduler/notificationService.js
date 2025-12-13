@@ -63,7 +63,12 @@ class NotificationService {
 
       // Send notifications in parallel
       const notificationPromises = activeNotifications.map((notif) =>
-     this.sendNotification(notif.user_integrations, task, log)
+     this.sendNotification(
+       notif.user_integrations, 
+       task, 
+log,
+    notif.include_response || false
+        )
       );
 
       await Promise.allSettled(notificationPromises);
@@ -77,21 +82,25 @@ class NotificationService {
    * @param {Object} integration - The integration object with credentials
    * @param {Object} task - The task object
    * @param {Object} log - The execution log object
+   * @param {boolean} includeResponse - Whether to include response body
    */
-  async sendNotification(integration, task, log) {
+  async sendNotification(integration, task, log, includeResponse = false) {
     try {
+ // Store includeResponse flag for use in notification methods
+      this.includeResponse = includeResponse;
+      
       switch (integration.integration_type) {
         case "slack":
           await this.sendSlackNotification(integration, task, log);
-          break;
+    break;
         case "email":
-          await this.sendEmailNotification(integration, task, log);
+  await this.sendEmailNotification(integration, task, log);
     break;
         case "sms":
           await this.sendSMSNotification(integration, task, log);
   break;
         case "webhook":
-          await this.sendWebhookNotification(integration, task, log);
+     await this.sendWebhookNotification(integration, task, log);
     break;
         default:
     console.log(`Unsupported integration type: ${integration.integration_type}`);
@@ -108,7 +117,7 @@ class NotificationService {
     const webhookUrl = integration.credentials.webhook_url;
 
     if (!webhookUrl) {
-      console.error("Slack webhook URL not found");
+ console.error("Slack webhook URL not found");
       return;
     }
 
@@ -119,66 +128,93 @@ class NotificationService {
 
     const payload = {
     attachments: [
-        {
+ {
    color: color,
    blocks: [
-       {
-    type: "header",
+    {
+ type: "header",
    text: {
      type: "plain_text",
     text: `${emoji} API Task ${status}: ${task.task_name}`,
           emoji: true,
   },
-      },
+   },
             {
          type: "section",
  fields: [
-         {
+       {
     type: "mrkdwn",
      text: `*Task Name:*\n${task.task_name}`,
     },
-           {
-         type: "mrkdwn",
+ {
+type: "mrkdwn",
             text: `*Status Code:*\n${log.status_code || "N/A"}`,
        },
-       {
+  {
           type: "mrkdwn",
              text: `*Response Time:*\n${log.response_time_ms}ms`,
-        },
+     },
          {
-               type: "mrkdwn",
+    type: "mrkdwn",
  text: `*Method:*\n${task.method}`,
-                },
+   },
    ],
    },
  {
-     type: "section",
-    text: {
+  type: "section",
+ text: {
     type: "mrkdwn",
   text: `*Endpoint:*\n\`${task.api_url}\``,
   },
     },
-          ],
+     ],
   },
       ],
-    };
+  };
 
     // Add error message if present
     if (log.error_message) {
-      payload.attachments[0].blocks.push({
+  payload.attachments[0].blocks.push({
         type: "section",
         text: {
-          type: "mrkdwn",
+  type: "mrkdwn",
   text: `*Error:*\n\`\`\`${log.error_message}\`\`\``,
+        },
+      });
+    }
+
+    // Add response body if requested (new feature!)
+ if (this.includeResponse && log.response_body) {
+      let responsePreview = log.response_body;
+      
+      // Truncate long responses to avoid Slack limits (max 3000 chars for code blocks)
+      const maxLength = 2000;
+      if (responsePreview.length > maxLength) {
+        responsePreview = responsePreview.substring(0, maxLength) + '\n\n... (truncated)';
+      }
+
+      // Try to format JSON nicely
+      try {
+     const jsonObj = JSON.parse(responsePreview);
+        responsePreview = JSON.stringify(jsonObj, null, 2);
+      } catch (e) {
+  // Not JSON, use as-is
+      }
+
+      payload.attachments[0].blocks.push({
+        type: "section",
+  text: {
+ type: "mrkdwn",
+          text: `*Response Body:*\n\`\`\`${responsePreview}\`\`\``,
         },
       });
     }
 
     // Add timestamp
     payload.attachments[0].blocks.push({
-      type: "context",
+   type: "context",
   elements: [
-        {
+     {
           type: "mrkdwn",
           text: `Executed at: <!date^${Math.floor(new Date(log.executed_at).getTime() / 1000)}^{date_short_pretty} at {time}|${log.executed_at}>`,
         },
@@ -188,8 +224,8 @@ class NotificationService {
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-      },
+"Content-Type": "application/json",
+    },
       body: JSON.stringify(payload),
     });
 

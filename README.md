@@ -103,19 +103,21 @@ API_Pulse/
 - **Dashboard** - 🔔 Link integrations to tasks with one click!
 - **Notification Rules** - Choose when to notify (always/failure/timeout)
 - **Visual Feedback** - See active notifications for each task
+- **Response Body** - 🆕 Optionally include API responses in notifications for debugging
 
 ### Notification Rules
 - **always** - Notify on every task execution
 - **failure_only** - Only notify when tasks fail (status >= 400)
 - **timeout** - Only notify on errors/timeouts
 
-### Quick Setup
-1. **Settings** → Add Slack integration (get webhook from Slack)
-2. **Dashboard** → Click 🔔 Notifications on any task
-3. Select integration and notification rule
-4. Done! Notifications will start automatically
+### 🆕 Include Response Body
+- ✅ **Optional feature** - Check a box to include API response
+- ✅ **Auto-formatted** - JSON responses pretty-printed
+- ✅ **Auto-truncated** - Long responses limited to 2,000 chars
+- ✅ **Visual badge** - Purple "📝 With Response" indicator
+- ✅ **Perfect for debugging** - See exactly what APIs return
 
-See the [detailed setup guide](docs/NOTIFICATION_SETUP.md) or [UI guide](docs/NOTIFICATION_UI_GUIDE.md) for more information.
+See the [response body guide](docs/INCLUDE_RESPONSE_FEATURE.md) for details.
 
 ## Database Schema
 

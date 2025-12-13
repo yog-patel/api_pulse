@@ -21,6 +21,7 @@ interface TaskNotification {
   id: string;
   integration_id: string;
   notify_on: string;
+  include_response: boolean;
   user_integrations: Integration;
 }
 
@@ -39,6 +40,7 @@ export default function Dashboard() {
   const [loadingNotifications, setLoadingNotifications] = useState(false);
   const [selectedIntegration, setSelectedIntegration] = useState('');
   const [notifyOn, setNotifyOn] = useState<'always' | 'failure_only' | 'timeout'>('always');
+  const [includeResponse, setIncludeResponse] = useState(false);
   
   const router = useRouter();
 
@@ -212,7 +214,7 @@ setShowNotificationModal(true);
   const handleAddNotification = async () => {
     if (!selectedIntegration) {
       alert('Please select an integration');
-      return;
+  return;
     }
 
     const { data: { session } } = await supabase.auth.getSession();
@@ -228,18 +230,20 @@ setShowNotificationModal(true);
      'Content-Type': 'application/json',
   },
           body: JSON.stringify({
-            task_id: selectedTask.id,
+   task_id: selectedTask.id,
    integration_id: selectedIntegration,
-            notify_on: notifyOn,
-          }),
+    notify_on: notifyOn,
+  include_response: includeResponse,
+ }),
    }
       );
 
       if (response.ok) {
-        const newLink = await response.json();
+  await response.json(); // Parse response
       // Refresh notifications
         openNotificationModal(selectedTask);
-        setSelectedIntegration('');
+    setSelectedIntegration('');
+  setIncludeResponse(false);
         alert('Notification added successfully!');
       } else {
 const error = await response.json();
@@ -452,14 +456,21 @@ const error = await response.json();
  </span>
           <div>
                 <p className="font-medium text-gray-900">{notif.user_integrations.name}</p>
-<div className="mt-1">{getNotificationBadge(notif.notify_on)}</div>
-             </div>
+    <div className="mt-1 flex items-center gap-2">
+     {getNotificationBadge(notif.notify_on)}
+       {notif.include_response && (
+   <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800">
+      📝 With Response
+     </span>
+      )}
+    </div>
+   </div>
  </div>
              <button
    onClick={() => handleRemoveNotification(notif.id)}
-        className="text-red-600 hover:text-red-900 text-sm"
-          >
-            Remove
+    className="text-red-600 hover:text-red-900 text-sm"
+ >
+       Remove
      </button>
          </div>
            ))}
@@ -504,17 +515,35 @@ const error = await response.json();
       <option value="always">Always (every execution)</option>
     <option value="failure_only">Failure Only (status ≥ 400)</option>
     <option value="timeout">Timeout/Error Only</option>
-             </select>
+   </select>
        <p className="text-xs text-gray-500 mt-1">
    Choose when you want to receive notifications for this task
     </p>
         </div>
 
+         <div className="flex items-start space-x-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+  <input
+     type="checkbox"
+           id="includeResponse"
+     checked={includeResponse}
+       onChange={(e) => setIncludeResponse(e.target.checked)}
+   className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label htmlFor="includeResponse" className="flex-1 cursor-pointer">
+     <div className="text-sm font-medium text-gray-900">
+          Include API Response Body
+      </div>
+        <div className="text-xs text-gray-600 mt-1">
+ Show the actual API response in notifications (useful for debugging). Long responses will be truncated.
+     </div>
+  </label>
+         </div>
+
      <button
    onClick={handleAddNotification}
-           disabled={!selectedIntegration}
-         className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
+  disabled={!selectedIntegration}
+className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
  Add Notification
      </button>
             </div>

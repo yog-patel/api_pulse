@@ -90,15 +90,15 @@ return new Response(JSON.stringify(notifications), {
 
     // POST: Link task to integration
     if (req.method === "POST") {
-      const { task_id, integration_id, notify_on } = await req.json();
+      const { task_id, integration_id, notify_on, include_response } = await req.json();
 
       if (!task_id || !integration_id) {
         return new Response(
-          JSON.stringify({ error: "task_id and integration_id are required" }),
+     JSON.stringify({ error: "task_id and integration_id are required" }),
           {
       status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
+  }
    );
       }
 
@@ -115,7 +115,7 @@ return new Response(JSON.stringify(notifications), {
        JSON.stringify({ error: "Task not found or unauthorized" }),
           {
  status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+     headers: { ...corsHeaders, "Content-Type": "application/json" },
     }
   );
       }
@@ -126,47 +126,48 @@ return new Response(JSON.stringify(notifications), {
         .select("id")
         .eq("id", integration_id)
         .eq("user_id", user.id)
-        .single();
+ .single();
 
  if (!integration) {
       return new Response(
           JSON.stringify({ error: "Integration not found or unauthorized" }),
           {
-            status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
    }
         );
       }
 
       // Insert the link
       const { data: link, error } = await supabase
-        .from("task_notifications")
+ .from("task_notifications")
   .insert([
     {
 task_id,
-            integration_id,
-            notify_on: notify_on || "always",
+       integration_id,
+       notify_on: notify_on || "always",
+   include_response: include_response || false,
           },
    ])
         .select()
   .single();
 
-      if (error) {
+  if (error) {
         // Check for duplicate
         if (error.code === "23505") {
      return new Response(
  JSON.stringify({ error: "This integration is already linked to this task" }),
-            {
+    {
        status: 400,
        headers: { ...corsHeaders, "Content-Type": "application/json" },
  }
      );
         }
 
-        return new Response(JSON.stringify({ error: error.message }), {
+  return new Response(JSON.stringify({ error: error.message }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+     });
       }
 
       return new Response(JSON.stringify(link), {
