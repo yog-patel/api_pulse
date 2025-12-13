@@ -29,14 +29,14 @@ Full email notification support using **Resend API**!
 ### **Modified Files:**
 
 1. **`scheduler/package.json`** ??
-   - Added `resend` dependency (^3.0.0)
+   - ~~Added `resend` dependency (^3.0.0)~~ (Not needed - using REST API)
 
 2. **`scheduler/.env.example`** ??
    - Added `RESEND_API_KEY` configuration
    - Added `FROM_EMAIL` configuration
 
 3. **`scheduler/notificationService.js`** ??
-   - Initialized Resend client
+ - ~~Initialized Resend client~~ Uses REST API directly via fetch()
    - Implemented `sendEmailNotification()`
    - HTML email generation
    - Error handling

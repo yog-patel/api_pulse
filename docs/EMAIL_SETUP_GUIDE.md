@@ -70,6 +70,8 @@ cd scheduler
 npm install
 ```
 
+**Note:** We use Resend's REST API directly, so no additional packages are needed beyond the existing dependencies.
+
 ### Step 6: Add Email Integration
 
 **Via UI:**

@@ -1,5 +1,4 @@
 const { createClient } = require("@supabase/supabase-js");
-const { Resend } = require("resend");
 const { generateSuccessEmail, generateFailureEmail } = require("./emailTemplates");
 
 /**
@@ -11,11 +10,9 @@ class NotificationService {
   constructor(supabaseUrl, supabaseKey) {
     this.supabase = createClient(supabaseUrl, supabaseKey);
     
-    // Initialize Resend for email notifications
-    if (process.env.RESEND_API_KEY) {
-      this.resend = new Resend(process.env.RESEND_API_KEY);
-      this.fromEmail = process.env.FROM_EMAIL || 'notifications@apipulse.dev';
-    }
+    // Store Resend configuration for email notifications
+    this.resendApiKey = process.env.RESEND_API_KEY;
+    this.fromEmail = process.env.FROM_EMAIL || 'notifications@apipulse.dev';
   }
 
   /**
@@ -245,12 +242,12 @@ type: "mrkdwn",
   }
 
   /**
-   * Send Email notification
+   * Send Email notification via Resend REST API
    */
   async sendEmailNotification(integration, task, log) {
-    if (!this.resend) {
+    if (!this.resendApiKey) {
       console.error("Resend not configured. Set RESEND_API_KEY in .env");
-      return;
+   return;
     }
 
     const toEmail = integration.credentials.email;
@@ -260,37 +257,42 @@ type: "mrkdwn",
       return;
     }
 
-    try {
-      const isSuccess = log.status_code && log.status_code >= 200 && log.status_code < 400;
+  try {
+    const isSuccess = log.status_code && log.status_code >= 200 && log.status_code < 400;
       const subject = isSuccess 
-  ? `? API Task Success: ${task.task_name}`
-     : `? API Task Failed: ${task.task_name}`;
+        ? `? API Task Success: ${task.task_name}`
+        : `? API Task Failed: ${task.task_name}`;
 
-  // Generate HTML email based on success/failure
-const htmlContent = isSuccess
+      // Generate HTML email based on success/failure
+      const htmlContent = isSuccess
         ? generateSuccessEmail(task, log)
-        : generateFailureEmail(task, log);
+   : generateFailureEmail(task, log);
 
-   // Include response body if requested
-  if (this.includeResponse && log.response_body) {
-  // Response body is already included in the HTML templates
-      }
-
-      const { data, error } = await this.resend.emails.send({
-     from: this.fromEmail,
- to: toEmail,
-  subject: subject,
- html: htmlContent,
+      // Send email via Resend REST API
+      const response = await fetch('https://api.resend.com/emails', {
+  method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.resendApiKey}`,
+     'Content-Type': 'application/json'
+      },
+        body: JSON.stringify({
+      from: this.fromEmail,
+    to: [toEmail],
+          subject: subject,
+  html: htmlContent
+     })
       });
 
-      if (error) {
-        throw new Error(`Resend API error: ${JSON.stringify(error)}`);
-      }
+   if (!response.ok) {
+  const errorData = await response.json();
+        throw new Error(`Resend API error: ${JSON.stringify(errorData)}`);
+  }
 
+      const data = await response.json();
       console.log(`? Email notification sent for task: ${task.task_name} (ID: ${data.id})`);
     } catch (error) {
       console.error(`Error sending email notification:`, error);
-  throw error;
+      throw error;
     }
   }
 
