@@ -103,6 +103,15 @@ async function executeTask(task) {
       );
     }
 
+    // Increment usage count for the user
+    const { error: usageError } = await supabase.rpc('increment_run_count', {
+      p_user_id: task.user_id
+    });
+
+    if (usageError) {
+      console.error(`Error incrementing usage count:`, usageError);
+    }
+
     // Send notifications
     await notificationService.sendTaskNotifications(task, logData);
 
@@ -145,6 +154,15 @@ async function executeTask(task) {
 
     if (logError) {
       console.error(`Error saving error log for task ${task.id}:`, logError);
+    }
+
+    // Increment usage count even for failed tasks (they still consume a run)
+    const { error: usageError } = await supabase.rpc('increment_run_count', {
+      p_user_id: task.user_id
+    });
+
+    if (usageError) {
+      console.error(`Error incrementing usage count:`, usageError);
     }
 
     // Send notifications for failed task

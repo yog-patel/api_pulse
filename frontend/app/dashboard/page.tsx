@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import UsageIndicator from '../../components/UsageIndicator';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -327,7 +328,10 @@ const error = await response.json();
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 py-12">
-     <div className="flex justify-between items-center mb-8">
+     {/* Usage Indicator */}
+        <UsageIndicator />
+        
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">API Tasks</h1>
       <Link
             href="/dashboard/create-task"

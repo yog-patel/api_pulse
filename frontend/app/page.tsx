@@ -206,72 +206,182 @@ export default function Home() {
       {/* Pricing Section */}
       <section id="pricing" className="bg-gradient-to-b from-white to-gray-50 py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl font-bold text-gray-900 mb-4">Simple Pricing</h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto mb-6"></div>
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+ <div className="w-20 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto mb-6"></div>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Choose the plan that fits your needs
+         Choose the plan that fits your monitoring needs
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Free Plan */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
-              <p className="text-gray-600 mb-6">Get started with zero cost</p>
-              <div className="text-4xl font-bold text-gray-900 mb-8">$0<span className="text-base text-gray-600 font-normal">/mo</span></div>
-              <ul className="text-gray-600 space-y-3 mb-8">
-                <li className="flex items-center"><span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span> 5 API jobs</li>
-                <li className="flex items-center"><span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span> Every 15 minutes</li>
-                <li className="flex items-center"><span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span> Email alerts</li>
-                <li className="flex items-center"><span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span> 24 hour history</li>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+         {/* Free Plan */}
+  <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300">
+     <div className="text-center mb-6">
+ <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
+   <p className="text-gray-600 text-sm mb-6">Perfect for personal projects</p>
+        <div className="mb-6">
+       <span className="text-5xl font-bold text-gray-900">$0</span>
+ <span className="text-gray-600 text-lg">/mo</span>
+</div>
+     </div>
+              
+              <ul className="space-y-4 mb-8">
+    <li className="flex items-start">
+  <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+         </svg>
+    <span className="text-gray-700"><strong className="text-gray-900">2</strong> API tasks</span>
+             </li>
+      <li className="flex items-start">
+       <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+         </svg>
+   <span className="text-gray-700">Every <strong className="text-gray-900">hour</strong> minimum</span>
+           </li>
+       <li className="flex items-start">
+         <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+ <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+     </svg>
+ <span className="text-gray-700"><strong className="text-gray-900">100</strong> runs/month</span>
+    </li>
+  <li className="flex items-start">
+     <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+   </svg>
+      <span className="text-gray-700">Dashboard only</span>
+         </li>
+      <li className="flex items-start">
+ <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+               </svg>
+  <span className="text-gray-700"><strong className="text-gray-900">7 day</strong> history</span>
+     </li>
               </ul>
-              <Link href="/auth/signup" className="w-full bg-gray-100 text-gray-900 px-4 py-3 rounded-lg hover:bg-gray-200 font-semibold text-center block transition-all duration-200">
-                Get Started
-              </Link>
+    
+    <Link href="/auth/signup" className="block w-full text-center px-6 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 font-semibold transition-colors">
+      Start Free
+        </Link>
+       </div>
+
+      {/* Starter Plan - Featured */}
+      <div className="relative transform md:scale-105 z-10">
+    <div className="absolute -top-5 left-0 right-0 flex justify-center">
+    <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+ Most Popular
+    </span>
+            </div>
+     <div className="bg-white rounded-2xl p-8 border-2 border-indigo-600 shadow-2xl hover:shadow-3xl transition-all duration-300 h-full">
+           <div className="text-center mb-6">
+             <h3 className="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
+                <p className="text-gray-600 text-sm mb-6">Great for small teams</p>
+         <div className="mb-6">
+       <span className="text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">$9</span>
+ <span className="text-gray-600 text-lg">/mo</span>
+       </div>
+           </div>
+             
+     <ul className="space-y-4 mb-8">
+      <li className="flex items-start">
+   <svg className="w-5 h-5 text-indigo-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+         </svg>
+    <span className="text-gray-700"><strong className="text-gray-900">10</strong> API tasks</span>
+         </li>
+             <li className="flex items-start">
+      <svg className="w-5 h-5 text-indigo-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+          <span className="text-gray-700">Every <strong className="text-gray-900">15 min</strong> minimum</span>
+     </li>
+         <li className="flex items-start">
+         <svg className="w-5 h-5 text-indigo-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+             </svg>
+  <span className="text-gray-700"><strong className="text-gray-900">2,000</strong> runs/month</span>
+         </li>
+          <li className="flex items-start">
+      <svg className="w-5 h-5 text-indigo-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+   <span className="text-gray-700">Email & Slack alerts</span>
+        </li>
+         <li className="flex items-start">
+                    <svg className="w-5 h-5 text-indigo-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+     </svg>
+        <span className="text-gray-700"><strong className="text-gray-900">14 day</strong> history</span>
+    </li>
+        </ul>
+     
+           <Link href="/auth/signup?plan=starter" className="block w-full text-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-semibold shadow-lg hover:shadow-xl transition-all">
+        Start 14-Day Trial
+       </Link>
+      </div>
             </div>
 
-            {/* Pro Plan - Featured */}
-            <div className="relative md:scale-105 group">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300"></div>
-              <div className="relative bg-white rounded-2xl p-8 border-2 border-indigo-600">
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-1 rounded-full text-sm font-bold">Most Popular</span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
-                <p className="text-gray-600 mb-6">For power users</p>
-                <div className="text-4xl font-bold text-gray-900 mb-8">$9<span className="text-base text-gray-600 font-normal">/mo</span></div>
-                <ul className="text-gray-600 space-y-3 mb-8">
-                  <li className="flex items-center"><span className="w-2 h-2 bg-indigo-600 rounded-full mr-3"></span> Unlimited jobs</li>
-                  <li className="flex items-center"><span className="w-2 h-2 bg-indigo-600 rounded-full mr-3"></span> Every minute</li>
-                  <li className="flex items-center"><span className="w-2 h-2 bg-indigo-600 rounded-full mr-3"></span> Slack & Discord</li>
-                  <li className="flex items-center"><span className="w-2 h-2 bg-indigo-600 rounded-full mr-3"></span> 30 day history</li>
-                  <li className="flex items-center"><span className="w-2 h-2 bg-indigo-600 rounded-full mr-3"></span> Priority support</li>
-                </ul>
-                <Link href="/auth/signup" className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-3 rounded-lg hover:shadow-lg font-semibold text-center block transition-all duration-200 transform hover:scale-105">
-                  Start Pro
-                </Link>
-              </div>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
-              <p className="text-gray-600 mb-6">For teams and scale</p>
-              <div className="text-4xl font-bold text-gray-900 mb-8">$29<span className="text-base text-gray-600 font-normal">/mo</span></div>
-              <ul className="text-gray-600 space-y-3 mb-8">
-                <li className="flex items-center"><span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span> Everything in Pro</li>
-                <li className="flex items-center"><span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span> 90 day history</li>
-                <li className="flex items-center"><span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span> Team access</li>
-                <li className="flex items-center"><span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span> SLA support</li>
-                <li className="flex items-center"><span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span> API access</li>
-              </ul>
-              <Link href="/auth/signup" className="w-full bg-gray-100 text-gray-900 px-4 py-3 rounded-lg hover:bg-gray-200 font-semibold text-center block transition-all duration-200">
-                Contact Sales
-              </Link>
-            </div>
+            {/* Pro Plan */}
+            <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-indigo-300 hover:shadow-xl transition-all duration-300">
+        <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
+     <p className="text-gray-600 text-sm mb-6">Full-featured monitoring</p>
+     <div className="mb-6">
+           <span className="text-5xl font-bold text-gray-900">$15</span>
+                  <span className="text-gray-600 text-lg">/mo</span>
+  </div>
+    </div>
+    
+         <ul className="space-y-4 mb-8">
+         <li className="flex items-start">
+      <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+  </svg>
+    <span className="text-gray-700"><strong className="text-gray-900">50</strong> API tasks</span>
+</li>
+         <li className="flex items-start">
+   <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+     <span className="text-gray-700">Every <strong className="text-gray-900">5 min</strong> minimum</span>
+       </li>
+        <li className="flex items-start">
+         <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+   </svg>
+            <span className="text-gray-700"><strong className="text-gray-900">5,000</strong> runs/month</span>
+    </li>
+        <li className="flex items-start">
+     <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+       </svg>
+                  <span className="text-gray-700">All channels + SMS</span>
+   </li>
+                <li className="flex items-start">
+       <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+         <span className="text-gray-700"><strong className="text-gray-900">30 day</strong> history</span>
+    </li>
+          <li className="flex items-start">
+ <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <span className="text-gray-700">Priority support</span>
+                </li>
+       </ul>
+              
+              <Link href="/auth/signup?plan=pro" className="block w-full text-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-semibold transition-colors">
+        Start 14-Day Trial
+ </Link>
+   </div>
           </div>
-        </div>
+          
+          <div className="text-center mt-12">
+  <p className="text-gray-600">
+              All plans include a <strong className="text-gray-900">14-day free trial</strong> • No credit card required
+      </p>
+          </div>
+   </div>
       </section>
 
       {/* FAQ Section */}
