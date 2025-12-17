@@ -13,6 +13,13 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 const notificationService = new NotificationService(supabaseUrl, supabaseKey);
 
+// Plan limits configuration
+const PLAN_LIMITS = {
+  free: { maxRunsPerMonth: 100 },
+  starter: { maxRunsPerMonth: 2000 },
+  pro: { maxRunsPerMonth: 5000 },
+};
+
 async function executeScheduledTasks() {
   try {
     console.log(`[${new Date().toISOString()}] Starting task execution...`);
@@ -58,6 +65,53 @@ async function executeTask(task) {
   try {
     console.log(`\n[${new Date().toISOString()}] Executing task: ${task.task_name} (${task.id})`);
 
+    // Check user's plan and usage limits BEFORE executing
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('plan_id')
+      .eq('id', task.user_id)
+      .single();
+
+    if (profileError) {
+      console.error(`Error fetching profile for user ${task.user_id}:`, profileError);
+    }
+
+    const userPlan = profile?.plan_id || 'free';
+    const planLimits = PLAN_LIMITS[userPlan] || PLAN_LIMITS.free;
+
+    // Get current month's usage
+    const currentDate = new Date();
+    const currentMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    
+    const { data: usage, error: usageError } = await supabase
+      .from('user_usage')
+      .select('runs_count')
+      .eq('user_id', task.user_id)
+      .eq('month', currentMonth)
+      .single();
+
+    if (usageError && usageError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error(`Error fetching usage for user ${task.user_id}:`, usageError);
+    }
+
+    const currentRuns = usage?.runs_count || 0;
+
+    // Check if user has reached their monthly run limit
+    if (currentRuns >= planLimits.maxRunsPerMonth) {
+      console.log(`⚠️  Task skipped: ${task.task_name} - User has reached monthly run limit (${currentRuns}/${planLimits.maxRunsPerMonth} for ${userPlan} plan)`);
+      
+      // Update next_run_at so it doesn't keep trying to execute
+      const nextRunAt = calculateNextRunTime(new Date(), task.schedule_interval);
+      await supabase
+        .from("api_tasks")
+        .update({
+          next_run_at: nextRunAt.toISOString(),
+        })
+        .eq("id", task.id);
+   
+      return; // Skip execution
+    }
+
     // Build request options
     const requestOptions = {
       method: task.method,
@@ -99,17 +153,17 @@ async function executeTask(task) {
       console.error(`Error saving log for task ${task.id}:`, logError);
     } else {
       console.log(
-        `✓ Task executed: ${task.task_name} - Status: ${response.status} - Time: ${responseTime}ms`
-      );
+   `✓ Task executed: ${task.task_name} - Status: ${response.status} - Time: ${responseTime}ms - Runs: ${currentRuns + 1}/${planLimits.maxRunsPerMonth}`
+ );
     }
 
     // Increment usage count for the user
-    const { error: usageError } = await supabase.rpc('increment_run_count', {
+    const { error: usageIncrementError } = await supabase.rpc('increment_run_count', {
       p_user_id: task.user_id
     });
 
-    if (usageError) {
-      console.error(`Error incrementing usage count:`, usageError);
+    if (usageIncrementError) {
+      console.error(`Error incrementing usage count:`, usageIncrementError);
     }
 
     // Send notifications
@@ -157,12 +211,12 @@ async function executeTask(task) {
     }
 
     // Increment usage count even for failed tasks (they still consume a run)
-    const { error: usageError } = await supabase.rpc('increment_run_count', {
+    const { error: usageIncrementError2 } = await supabase.rpc('increment_run_count', {
       p_user_id: task.user_id
     });
 
-    if (usageError) {
-      console.error(`Error incrementing usage count:`, usageError);
+    if (usageIncrementError2) {
+      console.error(`Error incrementing usage count:`, usageIncrementError2);
     }
 
     // Send notifications for failed task
