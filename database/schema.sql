@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS api_task_logs (
 CREATE TABLE IF NOT EXISTS user_integrations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  integration_type VARCHAR(50) NOT NULL CHECK (integration_type IN ('email', 'slack', 'sms', 'webhook')),
+  integration_type VARCHAR(50) NOT NULL CHECK (integration_type IN ('email', 'slack', 'sms', 'webhook', 'discord')),
   name VARCHAR(255) NOT NULL,
   credentials JSONB NOT NULL, -- Stores integration-specific data (email, webhook_url, phone_number, etc.)
   is_active BOOLEAN DEFAULT TRUE,

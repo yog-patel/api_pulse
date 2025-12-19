@@ -112,19 +112,22 @@ export default function Settings() {
         }
       );
 
+      // Get response body for better error messages
+      const data = await response.json();
+
       if (response.ok) {
-        const newIntegration = await response.json();
-        setIntegrations([...integrations, newIntegration]);
+        setIntegrations([...integrations, data]);
         setShowModal(false);
         setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', smsNumber: '' });
         alert('Integration added successfully! Check your channel for a test message.');
       } else {
-        const error = await response.json();
-        alert(`Failed to create integration: ${error.error || 'Unknown error'}`);
+        // Show detailed error message
+        console.error('Failed to create integration:', data);
+        alert(`Failed to create integration: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error creating integration:', error);
-      alert('An error occurred while creating the integration');
+      alert('An error occurred while creating the integration. Please check the console for details.');
     }
   };
 

@@ -88,13 +88,23 @@ status: 400,
         return new Response(
           JSON.stringify({ error: "Slack webhook URL is required" }),
    {
-         status: 400,
+       status: 400,
      headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
+       }
    );
+      }
+
+      if (integration_type === "discord" && !credentials.webhook_url) {
+     return new Response(
+ JSON.stringify({ error: "Discord webhook URL is required" }),
+          {
+       status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+   }
+);
     }
 
-      if (integration_type === "email" && !credentials.email) {
+    if (integration_type === "email" && !credentials.email) {
         return new Response(
       JSON.stringify({ error: "Email address is required" }),
     {
@@ -122,29 +132,29 @@ status: 400,
       if (integration_type === "slack") {
         try {
           const testResponse = await fetch(credentials.webhook_url, {
-          method: "POST",
-            headers: { "Content-Type": "application/json" },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-  text: "? API Pulse integration test successful! Your notifications are now active.",
+  text: "?? API Pulse integration test successful! Your notifications are now active.",
      }),
   });
 
           if (!testResponse.ok) {
       return new Response(
-              JSON.stringify({
-                error: "Invalid Slack webhook URL. Please check and try again.",
-              }),
+       JSON.stringify({
+     error: "Invalid Slack webhook URL. Please check and try again.",
+         }),
  {
           status: 400,
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
+     headers: { ...corsHeaders, "Content-Type": "application/json" },
          }
-      );
+);
           }
         } catch (error) {
           return new Response(
-       JSON.stringify({
-    error: "Failed to test Slack webhook. Please verify the URL.",
-            }),
+ JSON.stringify({
+error: "Failed to test Slack webhook. Please verify the URL.",
+          }),
             {
            status: 400,
          headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -154,35 +164,38 @@ status: 400,
       }
 
       // Test the integration before saving (for Discord)
-      if (integration_type === "discord" && credentials.webhook_url) {
+      if (integration_type === "discord") {
         try {
           const testResponse = await fetch(credentials.webhook_url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-       content: "?? API Pulse integration test successful! Your Discord notifications are now active.",
+    method: "POST",
+     headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+   content: "?? API Pulse integration test successful! Your Discord notifications are now active.",
      }),
   });
 
-          if (!testResponse.ok) {
+   if (!testResponse.ok) {
+       const errorText = await testResponse.text();
+          console.error("Discord webhook test failed:", testResponse.status, errorText);
  return new Response(
        JSON.stringify({
-  error: "Invalid Discord webhook URL. Please check and try again.",
-           }),
+  error: `Invalid Discord webhook URL. Status: ${testResponse.status}. Please check and try again.`,
+}),
      {
-                status: 400,
+              status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     }
-       );
-          }
+   );
+    }
         } catch (error) {
+   console.error("Discord webhook test error:", error);
           return new Response(
   JSON.stringify({
-      error: "Failed to test Discord webhook. Please verify the URL.",
-            }),
+  error: `Failed to test Discord webhook: ${error instanceof Error ? error.message : 'Unknown error'}. Please verify the URL.`,
+     }),
          {
       status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+  headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
      );
   }

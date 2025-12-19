@@ -263,7 +263,7 @@ type: "mrkdwn",
     // Build embed fields
     const fields = [
     {
-      name: "Task Name",
+    name: "Task Name",
         value: task.task_name,
      inline: true,
       },
@@ -271,30 +271,30 @@ type: "mrkdwn",
     name: "Status Code",
     value: String(log.status_code || "N/A"),
         inline: true,
-      },
+   },
       {
         name: "Response Time",
-      value: `${log.response_time_ms}ms`,
+  value: `${log.response_time_ms}ms`,
         inline: true,
       },
       {
 name: "Method",
  value: task.method,
     inline: true,
-      },
-      {
+    },
+    {
      name: "Endpoint",
-    value: `\`${task.api_url}\`",
-        inline: false,
-      },
+    value: `\`${task.api_url}\``,
+   inline: false,
+   },
     ];
 
     // Add error message if present
     if (log.error_message) {
       fields.push({
         name: "Error",
-        value: `\`\`\`${log.error_message.substring(0, 1000)}\`\`\``,
-        inline: false,
+   value: `\`\`\`${log.error_message.substring(0, 1000)}\`\`\``,
+      inline: false,
       });
     }
 
