@@ -22,7 +22,7 @@ export default function Settings() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [selectedType, setSelectedType] = useState<'email' | 'slack' | 'sms'>('email');
+  const [selectedType, setSelectedType] = useState<'email' | 'slack' | 'sms' | 'discord'>('email');
   const [user, setUser] = useState<any>(null);
   const [testingId, setTestingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -33,6 +33,7 @@ export default function Settings() {
     name: '',
     email: '',
     slackWebhook: '',
+    discordWebhook: '',
     smsNumber: '',
   });
 
@@ -51,14 +52,14 @@ export default function Settings() {
     setUser(session.user);
 
     try {
-    const response = await fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/manage-integrations`,
         {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json',
- },
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
         }
       );
 
@@ -68,13 +69,13 @@ export default function Settings() {
       } else {
         console.error('Failed to fetch integrations');
         setIntegrations([]);
-   }
+      }
     } catch (error) {
       console.error('Error fetching integrations:', error);
-  setIntegrations([]);
+      setIntegrations([]);
     } finally {
       setLoading(false);
-}
+    }
   };
 
   const handleAddIntegration = async (e: React.FormEvent) => {
@@ -92,6 +93,8 @@ export default function Settings() {
       payload.credentials = { email: formData.email };
     } else if (selectedType === 'slack') {
       payload.credentials = { webhook_url: formData.slackWebhook };
+    } else if (selectedType === 'discord') {
+      payload.credentials = { webhook_url: formData.discordWebhook };
     } else if (selectedType === 'sms') {
       payload.credentials = { phone_number: formData.smsNumber };
     }
@@ -101,27 +104,27 @@ export default function Settings() {
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/manage-integrations`,
         {
           method: 'POST',
- headers: {
- Authorization: `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),
         }
-   );
+      );
 
       if (response.ok) {
         const newIntegration = await response.json();
         setIntegrations([...integrations, newIntegration]);
         setShowModal(false);
-  setFormData({ name: '', email: '', slackWebhook: '', smsNumber: '' });
-        alert('Integration added successfully! Check your Slack for a test message.');
+        setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', smsNumber: '' });
+        alert('Integration added successfully! Check your channel for a test message.');
       } else {
         const error = await response.json();
         alert(`Failed to create integration: ${error.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error creating integration:', error);
-   alert('An error occurred while creating the integration');
+      alert('An error occurred while creating the integration');
     }
   };
 
@@ -134,7 +137,7 @@ export default function Settings() {
   const handleDeleteIntegration = async (integrationId: string) => {
     if (!confirm('Are you sure you want to delete this integration?')) return;
 
-  setDeletingId(integrationId);
+    setDeletingId(integrationId);
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
@@ -142,13 +145,13 @@ export default function Settings() {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/manage-integrations/${integrationId}`,
-     {
- method: 'DELETE',
+        {
+          method: 'DELETE',
           headers: {
-   Authorization: `Bearer ${session.access_token}`,
-    'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
           },
-     }
+        }
       );
 
       if (response.ok) {
@@ -158,8 +161,8 @@ export default function Settings() {
       }
     } catch (error) {
       console.error('Error deleting integration:', error);
-    alert('An error occurred while deleting the integration');
-  } finally {
+      alert('An error occurred while deleting the integration');
+    } finally {
       setDeletingId(null);
     }
   };
@@ -170,6 +173,8 @@ export default function Settings() {
         return '✉️';
       case 'slack':
         return '💬';
+      case 'discord':
+        return '🎮';
       case 'sms':
         return '📱';
       default:
@@ -300,13 +305,13 @@ export default function Settings() {
             <form onSubmit={handleAddIntegration} className="p-6 space-y-4">
               {/* Integration Type Tabs */}
               <div className="flex gap-2 mb-6">
-                {(['email', 'slack', 'sms'] as const).map((type) => (
+                {(['email', 'slack', 'discord', 'sms'] as const).map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => {
                       setSelectedType(type);
-                      setFormData({ name: '', email: '', slackWebhook: '', smsNumber: '' });
+                      setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', smsNumber: '' });
                     }}
                     className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
                       selectedType === type
@@ -328,7 +333,7 @@ export default function Settings() {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder={`e.g., "Team Slack" or "Alert Email"`}
+                  placeholder={`e.g., "Team Slack", "Discord Alerts", or "Alert Email"`}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                   required
                 />
@@ -367,6 +372,26 @@ export default function Settings() {
                   />
                   <p className="text-xs text-gray-600 mt-2">
                     Get your webhook URL from Slack's Incoming Webhooks app
+                  </p>
+                </div>
+              )}
+
+              {/* Discord Fields */}
+              {selectedType === 'discord' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Discord Webhook URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.discordWebhook}
+                    onChange={(e) => setFormData({ ...formData, discordWebhook: e.target.value })}
+                    placeholder="https://discord.com/api/webhooks/..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                    required
+                  />
+                  <p className="text-xs text-gray-600 mt-2">
+                    Get your webhook URL from Discord Server Settings → Integrations → Webhooks
                   </p>
                 </div>
               )}

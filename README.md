@@ -8,7 +8,7 @@ A web application for scheduling automated HTTP requests to API endpoints with r
 - 📊 Monitor execution logs and response status
 - 🔐 User authentication with Supabase
 - ⚡ Serverless backend using Supabase Edge Functions
-- 🔔 **Multi-channel notifications** (Slack, Email, SMS, Webhooks)
+- 🔔 **Multi-channel notifications** (Slack, Discord, Email, SMS, Webhooks)
 - 🤖 Automated execution via GitHub Actions (every 5 minutes)
 
 ## Quick Start
@@ -94,16 +94,17 @@ API_Pulse/
 
 ### Supported Channels
 - ✅ **Slack** - Free webhooks with rich formatting
-- ✅ **Email** - 🆕 Resend integration (100 emails/day free)
+- ✅ **Discord** - 🆕 Free webhooks with rich embeds
+- ✅ **Email** - Resend integration (100 emails/day free)
 - 🚧 **SMS** - Coming soon (Twilio integration)
 - ✅ **Custom Webhooks** - Send to any endpoint
 
 ### ✨ Easy Management UI
-- **Settings Page** - Add/manage notification integrations (Slack, Email, SMS)
+- **Settings Page** - Add/manage notification integrations (Slack, Discord, Email, SMS)
 - **Dashboard** - 🔔 Link integrations to tasks with one click!
 - **Notification Rules** - Choose when to notify (always/failure/timeout)
 - **Visual Feedback** - See active notifications for each task
-- **Response Body** - 🆕 Optionally include API responses in notifications for debugging
+- **Response Body** - Optionally include API responses in notifications for debugging
 
 ### Notification Rules
 - **always** - Notify on every task execution

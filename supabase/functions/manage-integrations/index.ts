@@ -72,7 +72,7 @@ headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
 
       // Validate integration type
-      const validTypes = ["email", "slack", "sms", "webhook"];
+      const validTypes = ["email", "slack", "sms", "webhook", "discord"];
     if (!validTypes.includes(integration_type)) {
         return new Response(
           JSON.stringify({ error: "Invalid integration type" }),
@@ -151,6 +151,41 @@ status: 400,
    }
           );
         }
+      }
+
+      // Test the integration before saving (for Discord)
+      if (integration_type === "discord" && credentials.webhook_url) {
+        try {
+          const testResponse = await fetch(credentials.webhook_url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+       content: "?? API Pulse integration test successful! Your Discord notifications are now active.",
+     }),
+  });
+
+          if (!testResponse.ok) {
+ return new Response(
+       JSON.stringify({
+  error: "Invalid Discord webhook URL. Please check and try again.",
+           }),
+     {
+                status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    }
+       );
+          }
+        } catch (error) {
+          return new Response(
+  JSON.stringify({
+      error: "Failed to test Discord webhook. Please verify the URL.",
+            }),
+         {
+      status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+     );
+  }
       }
 
       // Insert integration

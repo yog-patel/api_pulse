@@ -11,7 +11,6 @@ const supabase = createClient(
 
 interface UsageStats {
   currentRuns: number;
-  maxRuns: number;
   currentTasks: number;
   maxTasks: number;
   planId: string;
@@ -53,7 +52,6 @@ export default function UsageIndicator() {
 
       setUsage({
         currentRuns: usageData?.[0]?.runs_count || 0,
-        maxRuns: limits.maxRunsPerMonth,
         currentTasks: taskCount || 0,
         maxTasks: limits.maxTasks,
         planId,
@@ -68,10 +66,7 @@ export default function UsageIndicator() {
 
   if (loading || !usage) return null;
 
-  const runsPercentage = (usage.currentRuns / usage.maxRuns) * 100;
   const tasksPercentage = (usage.currentTasks / usage.maxTasks) * 100;
-
-  const isRunsNearLimit = runsPercentage >= 80;
   const isTasksNearLimit = tasksPercentage >= 80;
 
   return (
@@ -81,7 +76,7 @@ export default function UsageIndicator() {
           <h3 className="text-lg font-semibold text-gray-900">Usage This Month</h3>
           <p className="text-sm text-gray-600">{usage.planName} Plan</p>
         </div>
-        {(isRunsNearLimit || isTasksNearLimit) && (
+        {isTasksNearLimit && (
           <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded">
             Approaching Limit
           </span>
@@ -89,25 +84,16 @@ export default function UsageIndicator() {
       </div>
 
       <div className="space-y-4">
-        {/* API Runs */}
+        {/* API Runs Counter (no limit) */}
         <div>
           <div className="flex justify-between text-sm mb-1">
-            <span className="text-gray-700">API Runs</span>
-            <span className={runsPercentage >= 90 ? 'text-red-600 font-semibold' : 'text-gray-600'}>
-              {usage.currentRuns.toLocaleString()} / {usage.maxRuns.toLocaleString()}
+            <span className="text-gray-700">API Runs This Month</span>
+            <span className="text-indigo-600 font-semibold">
+              {usage.currentRuns.toLocaleString()}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all ${
-                runsPercentage >= 90
-                  ? 'bg-red-500'
-                  : runsPercentage >= 80
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
-              }`}
-              style={{ width: `${Math.min(runsPercentage, 100)}%` }}
-            />
+          <div className="text-xs text-gray-500">
+            Unlimited runs on your plan
           </div>
         </div>
 
@@ -135,10 +121,10 @@ export default function UsageIndicator() {
       </div>
 
       {/* Upgrade CTA */}
-      {(runsPercentage >= 80 || tasksPercentage >= 80) && usage.planId !== 'pro' && (
+      {tasksPercentage >= 80 && usage.planId !== 'pro' && (
         <div className="mt-4 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
           <p className="text-sm text-indigo-900 mb-2">
-            You're approaching your plan limits. Upgrade for more capacity!
+            You're approaching your task limit. Upgrade for more capacity!
           </p>
           <a
             href="/pricing"

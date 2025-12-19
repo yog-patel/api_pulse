@@ -4,10 +4,11 @@ This guide will help you set up notifications for API Pulse task executions.
 
 ## Supported Integrations
 
-- ? **Slack** - Free (Webhooks)
-- ?? **Email** - Coming soon (Resend)
+- ?? **Slack** - Free (Webhooks)
+- ?? **Discord** - Free (Webhooks)
+- ?? **Email** - Available (Resend)
 - ?? **SMS** - Coming soon (Twilio)
-- ? **Webhook** - Free (Custom endpoints)
+- ?? **Webhook** - Free (Custom endpoints)
 
 ---
 
@@ -26,49 +27,111 @@ This guide will help you set up notifications for API Pulse task executions.
 9. Select the channel where you want notifications
 10. Copy the **Webhook URL** (it looks like: `https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX`)
 
-### Step 2: Add Integration via API Pulse
+### Step 2: Add Integration via API Pulse Dashboard
 
-#### Option A: Using the API
+1. Navigate to **Dashboard > Settings**
+2. Click **+ Add Integration**
+3. Select **Slack** tab
+4. Enter a name and paste your webhook URL
+5. Click **Add Integration**
+6. Check your Slack channel for a test message!
 
-```bash
-curl -X POST https://your-supabase-url.supabase.co/functions/v1/manage-integrations \
-  -H "Authorization: Bearer YOUR_USER_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
- "integration_type": "slack",
-    "name": "My Slack Channel",
-    "credentials": {
-      "webhook_url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-    }
-  }'
-```
+---
 
-#### Option B: Using the Frontend (Coming Soon)
-Navigate to **Dashboard > Integrations** and add your Slack webhook.
+## ?? Setting Up Discord Notifications
 
-### Step 3: Link Integration to a Task
+### Step 1: Create a Discord Webhook
 
-```bash
-curl -X POST https://your-supabase-url.supabase.co/functions/v1/link-task-notification \
-  -H "Authorization: Bearer YOUR_USER_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "task_id": "your-task-uuid",
-    "integration_id": "your-integration-uuid",
-    "notify_on": "always"
-  }'
-```
+1. Open Discord and navigate to your server
+2. Right-click the channel where you want notifications
+3. Select **Edit Channel** ? **Integrations** ? **Webhooks**
+4. Click **Create Webhook**
+5. Customize the name (e.g., "API Pulse")
+6. Copy the **Webhook URL** (it looks like: `https://discord.com/api/webhooks/123456789/abcdefg...`)
+7. Click **Save Changes**
+
+### Step 2: Add Integration via API Pulse Dashboard
+
+1. Navigate to **Dashboard > Settings**
+2. Click **+ Add Integration**
+3. Select **Discord** tab
+4. Enter a name and paste your webhook URL
+5. Click **Add Integration**
+6. Check your Discord channel for a test message!
+
+**?? For detailed Discord setup, see [DISCORD_INTEGRATION_GUIDE.md](./DISCORD_INTEGRATION_GUIDE.md)**
+
+---
+
+## ?? Setting Up Email Notifications
+
+**?? See [EMAIL_SETUP_GUIDE.md](./EMAIL_SETUP_GUIDE.md) for complete email setup instructions**
+
+---
+
+## ?? Link Integration to a Task
+
+After adding an integration:
+
+1. Go to **Dashboard**
+2. Find your task and click **?? Notifications**
+3. Click **+ Add Notification**
+4. Select your integration
+5. Choose notification rule:
+   - **Always** - Every execution
+   - **Failure Only** - Only failures (status >= 400)
+   - **Timeout Only** - Only connection errors
+6. Optionally enable **Include API Response Body**
+7. Click **Save**
+
+---
+
+## ?? Notification Rules
 
 **Notification Rules (`notify_on`):**
-- `always` - Send notification for every execution (default)
+- `always` - Send notification for every execution
 - `failure_only` - Only when status code >= 400 or error occurs
 - `timeout` - Only when task execution fails with an error
+
+**Best Practices:**
+- Production tasks: Use `failure_only`
+- Development/testing: Use `always`
+- Network monitoring: Use `timeout`
+
+---
+
+## ?? Testing Your Integration
+
+After setting up:
+
+1. Link the integration to a task
+2. Wait for the scheduler to run (every 5 minutes)
+3. Or run scheduler manually: `node scheduler/scheduler.js`
+4. Check your channel for notifications!
+
+### Test Message Format
+
+**Slack Notifications** include:
+- ?/? Status indicator
+- Task name
+- HTTP status code
+- Response time
+- HTTP method
+- API endpoint
+- Error message (if failed)
+- Execution timestamp
+- Optional: Response body
+
+**Discord Notifications** include:
+- Same information as Slack
+- Rich colored embeds (green for success, red for failure)
+- Formatted in Discord's native embed style
 
 ---
 
 ## ?? Deploy Edge Functions
 
-Deploy the new notification functions to Supabase:
+If you're setting up from scratch, deploy the notification functions:
 
 ```bash
 # Navigate to your project root
@@ -83,123 +146,120 @@ supabase functions deploy link-task-notification
 
 ---
 
-## ?? Testing Your Integration
-
-After setting up Slack:
-
-1. Create or update a task
-2. Link the task to your Slack integration
-3. Wait for the scheduler to run (every 5 minutes) or trigger manually
-4. Check your Slack channel for notifications!
-
-### Test Message Format
-
-Notifications include:
-- ?/? Status indicator
-- Task name
-- HTTP status code
-- Response time
-- HTTP method
-- API endpoint
-- Error message (if failed)
-- Execution timestamp
-
----
-
-## ??? Environment Variables
+## ?? Environment Variables
 
 Make sure these are set in your `.env` file for the scheduler:
 
 ```env
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+RESEND_API_KEY=your_resend_api_key  # For email notifications
+FROM_EMAIL=notifications@apipulse.dev  # Your sender email
 ```
 
 ---
 
-## ?? API Endpoints
-
-### Manage Integrations
-- `GET /functions/v1/manage-integrations` - List all integrations
-- `POST /functions/v1/manage-integrations` - Create new integration
-- `DELETE /functions/v1/manage-integrations/:id` - Delete integration
-
-### Link Tasks to Notifications
-- `GET /functions/v1/link-task-notification?task_id=:id` - List notifications for a task
-- `POST /functions/v1/link-task-notification` - Link task to integration
-- `DELETE /functions/v1/link-task-notification/:id` - Unlink notification
-
----
-
-## ?? Troubleshooting
+## ??? Troubleshooting
 
 ### Notifications not being sent?
 
 1. **Check integration is active:**
-   ```sql
-   SELECT * FROM user_integrations WHERE user_id = 'your-user-id';
-   ```
+   - Go to Settings and verify green "Active" badge
 
-2. **Check task notification links:**
-   ```sql
-   SELECT * FROM task_notifications WHERE task_id = 'your-task-id';
-   ```
+2. **Check notification is linked:**
+   - Click ?? Notifications on your task
+   - Verify your integration is listed
 
-3. **Verify scheduler logs:**
-   Look for "Sending X notification(s) for task:" in scheduler output
+3. **Verify task is running:**
+   - Look for green "?? Running" status badge
 
-4. **Test Slack webhook manually:**
- ```bash
-   curl -X POST YOUR_WEBHOOK_URL \
-     -H "Content-Type: application/json" \
-     -d '{"text": "Test message"}'
-   ```
+4. **Check scheduler logs:**
+   - Run `node scheduler/scheduler.js` locally
+   - Look for "Sending X notification(s) for task:" message
 
-### Slack webhook not working?
+### Slack/Discord webhook not working?
 
-- Ensure the webhook URL starts with `https://hooks.slack.com/services/`
-- Check that the Slack app has permission to post in the channel
-- Verify the webhook hasn't been revoked in Slack settings
+**Slack:**
+- Ensure URL starts with `https://hooks.slack.com/services/...`
+- Check Slack app has permission to post
+- Verify webhook hasn't been revoked
 
----
+**Discord:**
+- Ensure URL starts with `https://discord.com/api/webhooks/...`
+- Check webhook still exists in Discord settings
+- Verify you have permissions in the channel
 
-## ?? Coming Soon
+### Still not working?
 
-### Email Notifications (Resend)
-- Free tier: 100 emails/day
-- Beautiful HTML templates
-- Delivery tracking
+Test the webhook manually:
 
-### SMS Notifications (Twilio)
-- Trial credits available
-- Critical alerts only
-- Rate limiting
+**Slack:**
+```bash
+curl -X POST YOUR_SLACK_WEBHOOK_URL \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Test message"}'
+```
 
-### Custom Webhooks
-- Send task data to any endpoint
-- Custom payload formatting
-- Retry logic
+**Discord:**
+```bash
+curl -X POST YOUR_DISCORD_WEBHOOK_URL \
+-H "Content-Type: application/json" \
+  -d '{"content": "Test message"}'
+```
 
 ---
 
 ## ?? Tips
 
-1. **Use different channels for different priorities:**
-   - `#api-alerts` for failures only
-   - `#api-all` for all executions
+### 1. Use Different Channels for Different Priorities
 
-2. **Set appropriate `notify_on` rules:**
-   - Production tasks: `failure_only`
-   - Testing tasks: `always`
+**Slack:**
+- `#api-critical` - Failure only
+- `#api-all` - All executions
+- `#api-dev` - Development testing
 
-3. **Monitor notification quotas:**
-   - Slack is unlimited
-   - Email/SMS have daily limits
+**Discord:**
+- `#production-alerts` - Failure only
+- `#monitoring` - All executions
+- `#dev-testing` - Development testing
+
+### 2. Set Appropriate Notification Rules
+
+- **Production APIs**: `failure_only` or `timeout`
+- **Testing APIs**: `always`
+- **Critical APIs**: `always` with response body
+
+### 3. Multiple Integrations per Task
+
+You can link multiple integrations to the same task:
+- Slack channel for team
+- Discord channel for ops
+- Email for on-call engineer
+
+### 4. Monitor Notification Performance
+
+- Slack: Unlimited messages
+- Discord: Unlimited messages
+- Email: Check your Resend quota
 
 ---
 
-## ?? Need Help?
+## ?? Related Documentation
+
+- [Discord Integration Guide](./DISCORD_INTEGRATION_GUIDE.md) - Detailed Discord setup
+- [Email Setup Guide](./EMAIL_SETUP_GUIDE.md) - Email configuration
+- [Notification UI Guide](./NOTIFICATION_UI_GUIDE.md) - Using the dashboard
+- [API Examples](./API_EXAMPLES.md) - API usage examples
+
+---
+
+## ? Need Help?
 
 - Check the [main README](../README.md)
 - Review [Slack Webhook Documentation](https://api.slack.com/messaging/webhooks)
+- Review [Discord Webhook Documentation](https://discord.com/developers/docs/resources/webhook)
 - Open an issue on GitHub
+
+---
+
+**Happy monitoring!** ????

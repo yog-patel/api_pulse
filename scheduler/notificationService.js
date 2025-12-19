@@ -92,25 +92,28 @@ log,
   async sendNotification(integration, task, log, includeResponse = false) {
     try {
  // Store includeResponse flag for use in notification methods
-      this.includeResponse = includeResponse;
+ this.includeResponse = includeResponse;
       
       switch (integration.integration_type) {
         case "slack":
           await this.sendSlackNotification(integration, task, log);
-    break;
-        case "email":
-  await this.sendEmailNotification(integration, task, log);
-    break;
+          break;
+     case "discord":
+   await this.sendDiscordNotification(integration, task, log);
+       break;
+     case "email":
+await this.sendEmailNotification(integration, task, log);
+          break;
         case "sms":
           await this.sendSMSNotification(integration, task, log);
-  break;
+       break;
         case "webhook":
-     await this.sendWebhookNotification(integration, task, log);
-    break;
-        default:
-    console.log(`Unsupported integration type: ${integration.integration_type}`);
-    }
-    } catch (error) {
+          await this.sendWebhookNotification(integration, task, log);
+  break;
+  default:
+     console.log(`Unsupported integration type: ${integration.integration_type}`);
+      }
+ } catch (error) {
       console.error(`Error sending ${integration.integration_type} notification:`, error);
     }
   }
@@ -239,6 +242,115 @@ type: "mrkdwn",
     }
 
     console.log(`? Slack notification sent for task: ${task.task_name}`);
+  }
+
+  /**
+   * Send Discord notification
+   */
+  async sendDiscordNotification(integration, task, log) {
+    const webhookUrl = integration.credentials.webhook_url;
+
+    if (!webhookUrl) {
+      console.error("Discord webhook URL not found");
+      return;
+    }
+
+    const isSuccess = log.status_code && log.status_code >= 200 && log.status_code < 400;
+    const emoji = isSuccess ? "?" : "?";
+    const status = isSuccess ? "Success" : "Failed";
+    const color = isSuccess ? 0x36a64f : 0xff0000; // Green or Red in decimal
+
+    // Build embed fields
+    const fields = [
+    {
+      name: "Task Name",
+        value: task.task_name,
+     inline: true,
+      },
+      {
+    name: "Status Code",
+    value: String(log.status_code || "N/A"),
+        inline: true,
+      },
+      {
+        name: "Response Time",
+      value: `${log.response_time_ms}ms`,
+        inline: true,
+      },
+      {
+name: "Method",
+ value: task.method,
+    inline: true,
+      },
+      {
+     name: "Endpoint",
+    value: `\`${task.api_url}\`",
+        inline: false,
+      },
+    ];
+
+    // Add error message if present
+    if (log.error_message) {
+      fields.push({
+        name: "Error",
+        value: `\`\`\`${log.error_message.substring(0, 1000)}\`\`\``,
+        inline: false,
+      });
+    }
+
+    // Add response body if requested
+    if (this.includeResponse && log.response_body) {
+      let responsePreview = log.response_body;
+      
+      // Truncate long responses (Discord field limit is 1024 chars)
+      const maxLength = 1000;
+  if (responsePreview.length > maxLength) {
+        responsePreview = responsePreview.substring(0, maxLength) + '\n\n... (truncated)';
+      }
+
+      // Try to format JSON nicely
+      try {
+   const jsonObj = JSON.parse(responsePreview);
+        responsePreview = JSON.stringify(jsonObj, null, 2);
+   } catch (e) {
+  // Not JSON, use as-is
+      }
+
+      fields.push({
+        name: "Response Body",
+    value: `\`\`\`json\n${responsePreview}\`\`\``,
+        inline: false,
+      });
+    }
+
+    const payload = {
+      embeds: [
+{
+          title: `${emoji} API Task ${status}: ${task.task_name}`,
+   color: color,
+      fields: fields,
+          footer: {
+   text: `Executed at ${new Date(log.executed_at).toLocaleString()}`,
+          },
+          timestamp: log.executed_at,
+        },
+      ],
+    };
+
+    const response = await fetch(webhookUrl, {
+ method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+  if (!response.ok) {
+   const errorText = await response.text();
+      throw new Error(`Discord API error: ${response.status} - ${errorText}`);
+    }
+
+    console.log(`?? Discord notification sent for task: ${task.task_name}`);
   }
 
   /**
