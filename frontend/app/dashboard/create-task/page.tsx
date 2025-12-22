@@ -17,7 +17,7 @@ export default function CreateTask() {
     api_url: '',
     method: 'GET',
     schedule_value: '5',
-    schedule_unit: 'm', // m, h, d
+    schedule_unit: 'm',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,7 +35,6 @@ export default function CreateTask() {
           return;
         }
 
-        // Get user's plan from profile
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('plan_id')
@@ -50,7 +49,6 @@ export default function CreateTask() {
         const planId = profile?.plan_id || 'free';
         setUserPlan(planId);
 
-        // Get current task count
         const { count, error: tasksError } = await supabase
           .from('api_tasks')
           .select('*', { count: 'exact', head: true })
@@ -64,7 +62,6 @@ export default function CreateTask() {
         const currentTaskCount = count || 0;
         setTaskCount(currentTaskCount);
 
-        // Check if user can create more tasks
         const allowed = canCreateTask(currentTaskCount, planId);
         setCanCreate(allowed);
 
@@ -88,7 +85,6 @@ export default function CreateTask() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    // Final check before submission
     if (!canCreate) {
       const limits = getPlanLimits(userPlan);
       setError(`You've reached the maximum of ${limits.maxTasks} tasks for your ${userPlan} plan. Please upgrade to create more tasks.`);
@@ -105,15 +101,14 @@ export default function CreateTask() {
         return;
       }
 
-      // Convert schedule_value and schedule_unit to schedule_interval format
       const schedule_interval = `${formData.schedule_value}${formData.schedule_unit}`;
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-task`,
         {
           method: 'POST',
-          headers:
-           { Authorization: `Bearer ${session.access_token}`,
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -140,42 +135,52 @@ export default function CreateTask() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <Link href="/" className="text-2xl font-bold text-indigo-600">
-            API Pulse
+          <Link href="/dashboard" className="inline-flex items-center space-x-2 group">
+            <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg">
+              <span className="text-white font-bold text-sm">AP</span>
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">API Pulse</span>
           </Link>
         </div>
-      </nav>
+      </header>
 
       <main className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-lg shadow p-8">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Create New Task</h1>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Create New Task</h1>
+              <p className="text-gray-600 mt-1">Schedule a new API endpoint to monitor</p>
+            </div>
             {userPlan && (
-              <span className="text-sm text-gray-600">
-                {taskCount} / {getPlanLimits(userPlan).maxTasks} tasks used
-              </span>
+              <div className="text-right">
+                <div className="text-sm text-gray-600">Task usage</div>
+                <div className="text-lg font-semibold text-gray-900">
+                  {taskCount} / {getPlanLimits(userPlan).maxTasks}
+                </div>
+              </div>
             )}
           </div>
 
           {!canCreate && (
             <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <div className="flex items-start">
-                <span className="text-2xl mr-3">??</span>
-                <div>
+                <span className="text-2xl mr-3">⚠️</span>
+                <div className="flex-1">
                   <h3 className="text-sm font-semibold text-yellow-900 mb-1">
                     Task Limit Reached
                   </h3>
                   <p className="text-sm text-yellow-800 mb-3">
-                    You've reached the maximum of {getPlanLimits(userPlan).maxTasks} tasks for your{" "}
+                    You've reached the maximum of {getPlanLimits(userPlan).maxTasks} tasks for your{' '}
                     <span className="font-semibold capitalize">{userPlan}</span> plan.
                   </p>
                   <Link
                     href="/pricing"
-                    className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm font-medium"
+                    className="inline-block gradient-primary text-white px-4 py-2 rounded-lg hover:shadow-lg text-sm font-semibold transition-all hover:scale-105"
                   >
-                    Upgrade Plan ?
+                    Upgrade Plan →
                   </Link>
                 </div>
               </div>
@@ -184,47 +189,50 @@ export default function CreateTask() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="task_name" className="block text-sm font-medium text-gray-700 mb-2">
                 Task Name
               </label>
               <input
+                id="task_name"
                 type="text"
                 name="task_name"
                 value={formData.task_name}
                 onChange={handleChange}
                 required
                 disabled={!canCreate}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
                 placeholder="e.g., Check API Status"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="api_url" className="block text-sm font-medium text-gray-700 mb-2">
                 API URL
               </label>
               <input
+                id="api_url"
                 type="url"
                 name="api_url"
                 value={formData.api_url}
                 onChange={handleChange}
                 required
                 disabled={!canCreate}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all font-mono text-sm"
                 placeholder="https://api.example.com/endpoint"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="method" className="block text-sm font-medium text-gray-700 mb-2">
                 HTTP Method
               </label>
               <select
+                id="method"
                 name="method"
                 value={formData.method}
                 onChange={handleChange}
                 disabled={!canCreate}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
@@ -232,7 +240,7 @@ export default function CreateTask() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="schedule" className="block text-sm font-medium text-gray-700 mb-2">
                 Schedule Interval
               </label>
               <div className="flex gap-2">
@@ -244,7 +252,7 @@ export default function CreateTask() {
                   required
                   min="1"
                   disabled={!canCreate}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
                   placeholder="5"
                 />
                 <select
@@ -252,7 +260,7 @@ export default function CreateTask() {
                   value={formData.schedule_unit}
                   onChange={handleChange}
                   disabled={!canCreate}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
                 >
                   <option value="m">Minutes</option>
                   <option value="h">Hours</option>
@@ -260,7 +268,7 @@ export default function CreateTask() {
                 </select>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                e.g., 5 minutes, 1 hour, 1 day (minimum {getPlanLimits(userPlan).minIntervalMinutes} minutes for {userPlan} plan)
+                Minimum interval: {getPlanLimits(userPlan).minIntervalMinutes} minutes for {userPlan} plan
               </p>
             </div>
 
@@ -270,27 +278,21 @@ export default function CreateTask() {
               </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 pt-4">
               <button
                 type="submit"
                 disabled={loading || !canCreate}
-                className="flex-1 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex-1 gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 shadow-lg hover:scale-[1.02] glow-hover"
               >
                 {loading ? 'Creating...' : !canCreate ? 'Upgrade Required' : 'Create Task'}
               </button>
               <Link
                 href="/dashboard"
-                className="flex-1 bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 text-center"
+                className="flex-1 bg-white text-gray-900 px-6 py-3 rounded-lg border-2 border-gray-200 hover:border-gray-300 text-center font-semibold transition-all"
               >
                 Cancel
               </Link>
             </div>
-
-            {!canCreate && (
-              <p className="text-red-500 text-sm mt-4">
-                You have reached the task limit for your plan. Upgrade to a higher plan to create more tasks.
-              </p>
-            )}
           </form>
         </div>
       </main>
