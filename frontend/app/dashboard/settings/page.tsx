@@ -22,7 +22,7 @@ export default function Settings() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [selectedType, setSelectedType] = useState<'email' | 'slack' | 'discord'>('slack');
+  const [selectedType, setSelectedType] = useState<'email' | 'slack' | 'discord' | 'webhook'>('slack');
   const [user, setUser] = useState<any>(null);
   const [userPlan, setUserPlan] = useState<string>('free');
   const [testingId, setTestingId] = useState<string | null>(null);
@@ -34,6 +34,7 @@ export default function Settings() {
     email: '',
     slackWebhook: '',
     discordWebhook: '',
+    webhookUrl: '',
   });
 
   useEffect(() => {
@@ -59,9 +60,13 @@ export default function Settings() {
         .single();
 
       if (!profileError && profile) {
-        setUserPlan(profile.plan_id || 'free');
+        const planId = profile.plan_id || 'free';
+        setUserPlan(planId);
         // Set default selected type based on plan
-        if (profile.plan_id !== 'pro' && selectedType === 'email') {
+        if (planId === 'free') {
+          // Free users can't use any notifications, but we'll show upgrade message
+          setSelectedType('slack'); // Default, but will be disabled
+        } else if (planId !== 'pro' && selectedType === 'email') {
           setSelectedType('slack');
         }
       }
@@ -99,6 +104,12 @@ export default function Settings() {
   const handleAddIntegration = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prevent free users from adding integrations
+    if (userPlan === 'free') {
+      setError('Free plan users can only view logs in the dashboard. Please upgrade to add notification integrations.');
+      return;
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
@@ -113,6 +124,8 @@ export default function Settings() {
       payload.credentials = { webhook_url: formData.slackWebhook };
     } else if (selectedType === 'discord') {
       payload.credentials = { webhook_url: formData.discordWebhook };
+    } else if (selectedType === 'webhook') {
+      payload.credentials = { webhook_url: formData.webhookUrl };
     }
 
     try {
@@ -190,6 +203,8 @@ export default function Settings() {
         return '💬';
       case 'discord':
         return '🎮';
+      case 'webhook':
+        return '🔗';
       default:
         return '🔔';
     }
@@ -333,35 +348,67 @@ export default function Settings() {
             </div>
 
             <form onSubmit={handleAddIntegration} className="p-6 space-y-4">
+              {userPlan === 'free' && (
+                <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-sm text-gray-600 text-center">
+                    Please upgrade to Starter or Pro plan to add notification integrations.
+                  </p>
+                </div>
+              )}
               {/* Integration Type Tabs */}
-              <div className="flex gap-2 mb-6">
-                {(['slack', 'discord', ...(userPlan === 'pro' ? ['email'] : [])] as const).map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => {
-                      setSelectedType(type);
-                      setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '' });
-                    }}
-                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors ${
-                      selectedType === type
-                        ? 'bg-black text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                    {type === 'email' && userPlan !== 'pro' && (
-                      <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Pro</span>
-                    )}
-                  </button>
-                ))}
-                {userPlan !== 'pro' && (
-                  <div className="flex-1 px-4 py-2 rounded-lg bg-gray-50 text-gray-400 font-semibold flex items-center justify-center relative">
-                    Email
-                    <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Pro Only</span>
+              {userPlan === 'free' ? (
+                <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <span className="text-2xl mr-3">⚠️</span>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-yellow-900 mb-1">
+                        Notifications Not Available
+                      </h3>
+                      <p className="text-sm text-yellow-800 mb-3">
+                        Free plan users can only view logs in the dashboard. Upgrade to Starter or Pro to enable Slack, Discord, and Email notifications.
+                      </p>
+                      <Link
+                        href="/pricing"
+                        className="inline-block bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 text-sm font-semibold transition-colors"
+                      >
+                        View Plans →
+                      </Link>
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex gap-2 mb-6">
+                  {(['slack', 'discord', ...(userPlan === 'pro' ? ['email', 'webhook'] : [])] as const).map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => {
+                        setSelectedType(type);
+                        setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', webhookUrl: '' });
+                      }}
+                      className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors ${
+                        selectedType === type
+                          ? 'bg-black text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </button>
+                  ))}
+                  {userPlan !== 'pro' && (
+                    <>
+                      <div className="flex-1 px-4 py-2 rounded-lg bg-gray-50 text-gray-400 font-semibold flex items-center justify-center relative">
+                        Email
+                        <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Pro Only</span>
+                      </div>
+                      <div className="flex-1 px-4 py-2 rounded-lg bg-gray-50 text-gray-400 font-semibold flex items-center justify-center relative">
+                        Webhook
+                        <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Pro Only</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
 
               {/* Common Name Field */}
               <div>
@@ -373,8 +420,9 @@ export default function Settings() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder={`e.g., "Team Slack", "Discord Alerts", or "Alert Email"`}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
                   required
+                  disabled={userPlan === 'free'}
                 />
               </div>
 
@@ -389,8 +437,9 @@ export default function Settings() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="alerts@example.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
                     required
+                    disabled={userPlan === 'free'}
                   />
                 </div>
               )}
@@ -406,8 +455,9 @@ export default function Settings() {
                     value={formData.slackWebhook}
                     onChange={(e) => setFormData({ ...formData, slackWebhook: e.target.value })}
                     placeholder="https://hooks.slack.com/services/..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all font-mono text-sm"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all font-mono text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                     required
+                    disabled={userPlan === 'free'}
                   />
                   <p className="text-xs text-gray-600 mt-2">
                     Get your webhook URL from Slack's Incoming Webhooks app
@@ -426,12 +476,49 @@ export default function Settings() {
                     value={formData.discordWebhook}
                     onChange={(e) => setFormData({ ...formData, discordWebhook: e.target.value })}
                     placeholder="https://discord.com/api/webhooks/..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all font-mono text-sm"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all font-mono text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                     required
+                    disabled={userPlan === 'free'}
                   />
                   <p className="text-xs text-gray-600 mt-2">
                     Get your webhook URL from Discord Server Settings → Integrations → Webhooks
                   </p>
+                </div>
+              )}
+
+              {/* Custom Webhook Fields (Pro only) */}
+              {selectedType === 'webhook' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Custom Webhook URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.webhookUrl}
+                    onChange={(e) => setFormData({ ...formData, webhookUrl: e.target.value })}
+                    placeholder="https://your-endpoint.com/webhook"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all font-mono text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    required
+                    disabled={userPlan !== 'pro'}
+                  />
+                  <p className="text-xs text-gray-600 mt-2">
+                    Enter any HTTP endpoint that accepts POST requests. We'll send task execution data as JSON.
+                  </p>
+                  <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Payload format:</p>
+                    <pre className="text-xs text-gray-600 overflow-x-auto">
+{`{
+  "task_id": "uuid",
+  "task_name": "string",
+  "api_url": "string",
+  "method": "GET|POST",
+  "status_code": 200,
+  "response_time_ms": 150,
+  "error_message": null,
+  "executed_at": "ISO timestamp"
+}`}
+                    </pre>
+                  </div>
                 </div>
               )}
 
@@ -445,9 +532,10 @@ export default function Settings() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 bg-black text-white rounded-lg hover:bg-gray-800 font-semibold transition-all duration-200"
+                  disabled={userPlan === 'free'}
+                  className="flex-1 px-4 py-3 bg-black text-white rounded-lg hover:bg-gray-800 font-semibold transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  Add Integration
+                  {userPlan === 'free' ? 'Upgrade Required' : 'Add Integration'}
                 </button>
               </div>
             </form>

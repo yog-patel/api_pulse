@@ -427,6 +427,16 @@ name: "Method",
       executed_at: log.executed_at,
     };
 
+    // Include response body if requested
+    if (this.includeResponse && log.response_body) {
+      try {
+        // Try to parse as JSON, fallback to string
+        payload.response_body = JSON.parse(log.response_body);
+      } catch (e) {
+        payload.response_body = log.response_body;
+      }
+    }
+
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {

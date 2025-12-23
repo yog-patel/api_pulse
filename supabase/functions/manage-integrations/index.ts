@@ -83,29 +83,61 @@ status: 400,
  );
   }
 
+      // Fetch user's plan to check restrictions
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("plan_id")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError || !profile) {
+        return new Response(
+          JSON.stringify({ error: "Failed to fetch user plan" }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      const planId = profile.plan_id || "free";
+
       // Check plan restrictions for email integration (Pro only)
       if (integration_type === "email") {
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("plan_id")
-          .eq("id", user.id)
-          .single();
-
-        if (profileError || !profile) {
-          return new Response(
-            JSON.stringify({ error: "Failed to fetch user plan" }),
-            {
-              status: 500,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            }
-          );
-        }
-
-        const planId = profile.plan_id || "free";
         if (planId !== "pro") {
           return new Response(
             JSON.stringify({ 
               error: "Email notifications are only available on the Pro plan. Please upgrade to use this feature." 
+            }),
+            {
+              status: 403,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+      }
+
+      // Check plan restrictions for Slack and Discord (Starter+ only)
+      if (integration_type === "slack" || integration_type === "discord") {
+        if (planId === "free") {
+          return new Response(
+            JSON.stringify({ 
+              error: `${integration_type.charAt(0).toUpperCase() + integration_type.slice(1)} notifications are only available on Starter and Pro plans. Please upgrade to use this feature.` 
+            }),
+            {
+              status: 403,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+      }
+
+      // Check plan restrictions for custom webhooks (Pro only)
+      if (integration_type === "webhook") {
+        if (planId !== "pro") {
+          return new Response(
+            JSON.stringify({ 
+              error: "Custom webhooks are only available on the Pro plan. Please upgrade to use this feature." 
             }),
             {
               status: 403,
@@ -135,6 +167,16 @@ status: 400,
    }
 );
     }
+
+      if (integration_type === "webhook" && !credentials.webhook_url) {
+        return new Response(
+          JSON.stringify({ error: "Webhook URL is required" }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
 
     if (integration_type === "email" && !credentials.email) {
         return new Response(
@@ -230,7 +272,49 @@ error: "Failed to test Slack webhook. Please verify the URL.",
   headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
      );
-  }
+        }
+      }
+
+      // Test the integration before saving (for Custom Webhooks)
+      if (integration_type === "webhook") {
+        try {
+          const testPayload = {
+            test: true,
+            message: "API Pulse webhook integration test successful! Your notifications are now active.",
+            timestamp: new Date().toISOString(),
+          };
+
+          const testResponse = await fetch(credentials.webhook_url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(testPayload),
+          });
+
+          if (!testResponse.ok) {
+            const errorText = await testResponse.text();
+            console.error("Webhook test failed:", testResponse.status, errorText);
+            return new Response(
+              JSON.stringify({
+                error: `Invalid webhook URL. Status: ${testResponse.status}. Please check and try again.`,
+              }),
+              {
+                status: 400,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              }
+            );
+          }
+        } catch (error) {
+          console.error("Webhook test error:", error);
+          return new Response(
+            JSON.stringify({
+              error: `Failed to test webhook: ${error instanceof Error ? error.message : 'Unknown error'}. Please verify the URL.`,
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
       }
 
       // Insert integration

@@ -19,7 +19,8 @@ export const PLANS = {
     features: {
       dashboard: true,
       emailNotifications: false,
-slackNotifications: false,
+      slackNotifications: false,
+      discordNotifications: false,
       smsNotifications: false,
       apiAccess: false,
       prioritySupport: false,
