@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { canCreateTask, getPlanLimits, isIntervalAllowed, getAvailableIntervals } from '../../../../lib/plans';
+import { canCreateTask, getPlanLimits, isIntervalAllowed } from '../../../../lib/plans';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -18,7 +18,12 @@ export default function CreateTask() {
     method: 'GET',
     schedule_value: '5',
     schedule_unit: 'm',
+    request_body: '',
+    request_headers: '{}',
   });
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [headerError, setHeaderError] = useState('');
+  const [bodyError, setBodyError] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userPlan, setUserPlan] = useState<string>('free');
@@ -80,6 +85,28 @@ export default function CreateTask() {
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Validate JSON when headers or body change
+    if (name === 'request_headers') {
+      try {
+        JSON.parse(value || '{}');
+        setHeaderError('');
+      } catch (err) {
+        setHeaderError('Invalid JSON format');
+      }
+    }
+    if (name === 'request_body' && formData.method === 'POST') {
+      try {
+        if (value.trim()) {
+          JSON.parse(value);
+          setBodyError('');
+        } else {
+          setBodyError('');
+        }
+      } catch (err) {
+        setBodyError('Invalid JSON format');
+      }
+    }
   };
 
   const handleSubmit = async (e: any) => {
@@ -109,6 +136,29 @@ export default function CreateTask() {
       return;
     }
 
+    // Validate JSON fields
+    let parsedHeaders = {};
+    if (formData.request_headers && formData.request_headers.trim()) {
+      try {
+        parsedHeaders = JSON.parse(formData.request_headers);
+      } catch (err) {
+        setError('Invalid JSON in request headers');
+        return;
+      }
+    }
+
+    let parsedBody = null;
+    if (formData.method === 'POST' && formData.request_body && formData.request_body.trim()) {
+      try {
+        const parsed = JSON.parse(formData.request_body);
+        // Convert back to string for storage
+        parsedBody = JSON.stringify(parsed);
+      } catch (err) {
+        setError('Invalid JSON in request body');
+        return;
+      }
+    }
+
     setLoading(true);
     setError('');
 
@@ -134,6 +184,8 @@ export default function CreateTask() {
             api_url: formData.api_url,
             method: formData.method,
             schedule_interval,
+            request_headers: parsedHeaders,
+            request_body: parsedBody || null,
           }),
         }
       );
@@ -248,13 +300,94 @@ export default function CreateTask() {
                 id="method"
                 name="method"
                 value={formData.method}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  // Clear body error when switching methods
+                  if (e.target.value === 'GET') {
+                    setBodyError('');
+                  }
+                }}
                 disabled={!canCreate}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
               >
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
               </select>
+            </div>
+
+            {/* Advanced Options */}
+            <div className="border-t border-gray-200 pt-6">
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                <span>Advanced Options</span>
+                <svg
+                  className={`w-5 h-5 transform transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showAdvanced && (
+                <div className="mt-4 space-y-6">
+                  {/* Request Headers */}
+                  <div>
+                    <label htmlFor="request_headers" className="block text-sm font-medium text-gray-700 mb-2">
+                      Custom Headers (JSON)
+                    </label>
+                    <textarea
+                      id="request_headers"
+                      name="request_headers"
+                      value={formData.request_headers}
+                      onChange={handleChange}
+                      disabled={!canCreate}
+                      rows={4}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all font-mono text-sm ${
+                        headerError ? 'border-red-300' : 'border-gray-300'
+                      }`}
+                      placeholder='{"Authorization": "Bearer token", "X-API-Key": "your-key"}'
+                    />
+                    {headerError && (
+                      <p className="mt-1 text-xs text-red-600">{headerError}</p>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500">
+                      Enter headers as JSON object. Example: {"{"}"Authorization": "Bearer token"{"}"}
+                    </p>
+                  </div>
+
+                  {/* Request Body (only for POST) */}
+                  {formData.method === 'POST' && (
+                    <div>
+                      <label htmlFor="request_body" className="block text-sm font-medium text-gray-700 mb-2">
+                        Request Body (JSON)
+                      </label>
+                      <textarea
+                        id="request_body"
+                        name="request_body"
+                        value={formData.request_body}
+                        onChange={handleChange}
+                        disabled={!canCreate}
+                        rows={6}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all font-mono text-sm ${
+                          bodyError ? 'border-red-300' : 'border-gray-300'
+                        }`}
+                        placeholder='{"key": "value", "data": "example"}'
+                      />
+                      {bodyError && (
+                        <p className="mt-1 text-xs text-red-600">{bodyError}</p>
+                      )}
+                      <p className="mt-1 text-xs text-gray-500">
+                        Enter request body as JSON. This will be sent with POST requests.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
