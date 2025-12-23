@@ -72,7 +72,7 @@ headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
 
       // Validate integration type
-      const validTypes = ["email", "slack", "sms", "webhook", "discord"];
+      const validTypes = ["email", "slack", "webhook", "discord"];
     if (!validTypes.includes(integration_type)) {
         return new Response(
           JSON.stringify({ error: "Invalid integration type" }),
@@ -82,6 +82,38 @@ status: 400,
           }
  );
   }
+
+      // Check plan restrictions for email integration (Pro only)
+      if (integration_type === "email") {
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("plan_id")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError || !profile) {
+          return new Response(
+            JSON.stringify({ error: "Failed to fetch user plan" }),
+            {
+              status: 500,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+
+        const planId = profile.plan_id || "free";
+        if (planId !== "pro") {
+          return new Response(
+            JSON.stringify({ 
+              error: "Email notifications are only available on the Pro plan. Please upgrade to use this feature." 
+            }),
+            {
+              status: 403,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+      }
 
       // Validate credentials based on type
       if (integration_type === "slack" && !credentials.webhook_url) {

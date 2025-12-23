@@ -89,7 +89,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Automate your API monitoring with scheduled HTTP requests. Get results delivered automatically. 
+              Automate your API monitoring with scheduled HTTP requests. Get instant notifications via Slack, Discord, or Email when your APIs fail or succeed. 
               <span className="font-semibold text-gray-900"> No servers, no cron, no DevOps.</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -215,15 +215,15 @@ export default function Home() {
                 <ul className="text-gray-600 space-y-3 text-sm">
                   <li className="flex items-center">
                     <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                    Email notifications with rich formatting
+                    Slack webhooks with rich formatting
                   </li>
                   <li className="flex items-center">
                     <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                    Slack integration with webhooks
+                    Discord webhooks with beautiful embeds
                   </li>
                   <li className="flex items-center">
                     <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
-                    Discord webhooks with embeds
+                    Email notifications (Pro plan)
                   </li>
                   <li className="flex items-center">
                     <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
@@ -473,7 +473,7 @@ export default function Home() {
                       <svg className="w-5 h-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
-                      <span className="text-gray-700">Email & Slack alerts</span>
+                      <span className="text-gray-700">Slack & Discord alerts</span>
                     </li>
                     <li className="flex items-start">
                       <svg className="w-5 h-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -526,7 +526,7 @@ export default function Home() {
                     <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-gray-700">All channels + SMS</span>
+                    <span className="text-gray-700">Email, Slack & Discord</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -568,56 +568,159 @@ export default function Home() {
             {/* FAQ Item 1 */}
             <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
               <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
-                How secure is API Pulse?
+                What is API Pulse and how does it work?
                 <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
               </summary>
-              <p className="text-gray-600 mt-4 leading-relaxed">
-                We use industry-standard encryption, Row-Level Security policies, and secure API authentication. Your API URLs and responses are encrypted at rest and in transit.
-              </p>
+              <div className="text-gray-600 mt-4 leading-relaxed space-y-3">
+                <p>
+                  API Pulse is a serverless API monitoring and scheduling service. You simply add your API endpoint URL, set a schedule (how often to check it), and we automatically make HTTP requests to your API at the specified intervals.
+                </p>
+                <p>
+                  Each execution is logged with response status, timing, and error details. You can receive notifications via Slack, Discord, Email (Pro), or custom webhooks when your API succeeds or fails.
+                </p>
+              </div>
             </details>
 
             {/* FAQ Item 2 */}
             <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
               <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
-                How do I authenticate API requests?
+                How do I add webhooks and connect them to tasks?
                 <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
               </summary>
-              <p className="text-gray-600 mt-4 leading-relaxed">
-                You can add custom headers to your requests, including Authorization headers. API keys, Bearer tokens, and Basic Auth are all supported.
-              </p>
+              <div className="text-gray-600 mt-4 leading-relaxed space-y-3">
+                <p className="font-semibold text-gray-900">Step 1: Add a Webhook Integration</p>
+                <ol className="list-decimal list-inside space-y-2 ml-2">
+                  <li>Go to <strong>Dashboard → Settings</strong></li>
+                  <li>Click <strong>"+ Add Integration"</strong></li>
+                  <li>Select the <strong>"Webhook"</strong> tab</li>
+                  <li>Enter a name (e.g., "My Custom Endpoint")</li>
+                  <li>Paste your webhook URL (any HTTP endpoint that accepts POST requests)</li>
+                  <li>Click <strong>"Add Integration"</strong></li>
+                </ol>
+                <p className="font-semibold text-gray-900 mt-4">Step 2: Connect to a Task</p>
+                <ol className="list-decimal list-inside space-y-2 ml-2">
+                  <li>Go to your <strong>Dashboard</strong> and find the task you want to monitor</li>
+                  <li>Click the <strong>"🔔 Notifications"</strong> button in the Actions column</li>
+                  <li>In the modal, select your webhook integration from the dropdown</li>
+                  <li>Choose when to notify:
+                    <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
+                      <li><strong>Always</strong> - Every execution (success or failure)</li>
+                      <li><strong>Failure Only</strong> - Only when API returns error status codes</li>
+                      <li><strong>Timeout Only</strong> - Only on connection errors or timeouts</li>
+                    </ul>
+                  </li>
+                  <li>Optionally check <strong>"Include API Response Body"</strong> to send the full response</li>
+                  <li>Click <strong>"Add Notification"</strong></li>
+                </ol>
+                <p className="mt-3 text-sm bg-purple-50 p-3 rounded-lg border border-purple-200">
+                  <strong>💡 Tip:</strong> Your webhook will receive a JSON payload with task execution details including status, response time, status code, and optional response body.
+                </p>
+              </div>
             </details>
 
             {/* FAQ Item 3 */}
             <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
               <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
-                Can I send POST bodies?
+                What notification channels are available on each plan?
                 <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
               </summary>
-              <p className="text-gray-600 mt-4 leading-relaxed">
-                Yes! You can choose GET or POST methods and add custom JSON request bodies, headers, and parameters as needed.
-              </p>
+              <div className="text-gray-600 mt-4 leading-relaxed space-y-3">
+                <ul className="space-y-2">
+                  <li><strong>Free Plan:</strong> Dashboard view only (no notifications)</li>
+                  <li><strong>Starter Plan ($9/mo):</strong> Slack and Discord integrations</li>
+                  <li><strong>Pro Plan ($15/mo):</strong> Email, Slack, Discord, and custom webhooks</li>
+                </ul>
+                <p className="text-sm bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  All plans can use custom webhooks, but Pro users get priority support and advanced features.
+                </p>
+              </div>
             </details>
 
             {/* FAQ Item 4 */}
             <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
               <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
-                Do you store my API response data?
+                How do I authenticate my API requests?
                 <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
               </summary>
-              <p className="text-gray-600 mt-4 leading-relaxed">
-                Yes, we store response logs so you can review past executions. You can view logs for the duration of your plan (7d, 14d, or 30d).
-              </p>
+              <div className="text-gray-600 mt-4 leading-relaxed space-y-3">
+                <p>
+                  When creating a task, you can add custom headers including:
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li><strong>Authorization:</strong> Bearer tokens, API keys, Basic Auth</li>
+                  <li><strong>Custom headers:</strong> Any header your API requires (X-API-Key, etc.)</li>
+                  <li><strong>Request body:</strong> JSON payloads for POST requests</li>
+                </ul>
+                <p className="text-sm bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                  <strong>🔒 Security:</strong> All credentials are encrypted and stored securely. Only you can access your API configurations.
+                </p>
+              </div>
             </details>
 
             {/* FAQ Item 5 */}
             <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
               <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
-                Can I export logs?
+                What are the minimum check intervals for each plan?
+                <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
+              </summary>
+              <div className="text-gray-600 mt-4 leading-relaxed space-y-3">
+                <ul className="space-y-2">
+                  <li><strong>Free Plan:</strong> Minimum 1 hour (60 minutes) between checks</li>
+                  <li><strong>Starter Plan:</strong> Minimum 15 minutes between checks</li>
+                  <li><strong>Pro Plan:</strong> Minimum 5 minutes between checks</li>
+                </ul>
+                <p>
+                  You can also set longer intervals (6 hours, daily, etc.) on any plan. These limits help ensure fair resource usage across all users.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ Item 6 */}
+            <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
+                How long are execution logs stored?
+                <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
+              </summary>
+              <div className="text-gray-600 mt-4 leading-relaxed space-y-3">
+                <ul className="space-y-2">
+                  <li><strong>Free Plan:</strong> Last 7 days of execution history</li>
+                  <li><strong>Starter Plan:</strong> Last 14 days of execution history</li>
+                  <li><strong>Pro Plan:</strong> Last 30 days of execution history</li>
+                </ul>
+                <p>
+                  You can view all logs within your retention period from the task's logs page. Older logs are automatically archived.
+                </p>
+              </div>
+            </details>
+
+            {/* FAQ Item 7 */}
+            <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
+                Can I use POST requests with custom bodies?
                 <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
               </summary>
               <p className="text-gray-600 mt-4 leading-relaxed">
-                Coming soon! We're working on CSV and JSON export features for Pro and Enterprise users.
+                Yes! When creating a task, you can choose between GET and POST methods. For POST requests, you can add a custom JSON request body, headers, and query parameters. This is perfect for APIs that require data submission or specific payloads.
               </p>
+            </details>
+
+            {/* FAQ Item 8 */}
+            <details className="group bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-lg">
+                How secure is my data?
+                <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300">+</span>
+              </summary>
+              <div className="text-gray-600 mt-4 leading-relaxed space-y-3">
+                <p>
+                  We use industry-standard security practices:
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>All data encrypted at rest and in transit (HTTPS/TLS)</li>
+                  <li>Row-Level Security (RLS) policies ensure you can only access your own data</li>
+                  <li>API credentials stored securely with encryption</li>
+                  <li>No access to your API responses except for logging (which you control)</li>
+                </ul>
+              </div>
             </details>
           </div>
         </div>

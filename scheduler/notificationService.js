@@ -3,7 +3,7 @@ const { generateSuccessEmail, generateFailureEmail } = require("./emailTemplates
 
 /**
  * Notification Service
- * Handles sending notifications via different channels (Slack, Email, SMS)
+ * Handles sending notifications via different channels (Slack, Email, Discord, Webhooks)
  */
 
 class NotificationService {
@@ -104,9 +104,6 @@ log,
      case "email":
 await this.sendEmailNotification(integration, task, log);
           break;
-        case "sms":
-          await this.sendSMSNotification(integration, task, log);
-       break;
         case "webhook":
           await this.sendWebhookNotification(integration, task, log);
   break;
@@ -409,15 +406,6 @@ name: "Method",
   }
 
   /**
-   * Send SMS notification
-   */
-  async sendSMSNotification(integration, task, log) {
-    // TODO: Implement SMS sending using Twilio or another provider
-    console.log(`SMS notification would be sent to: ${integration.credentials.phone_number}`);
-    console.log(`Task: ${task.task_name}, Status: ${log.status_code}`);
-  }
-
-/**
    * Send Webhook notification
    */
   async sendWebhookNotification(integration, task, log) {

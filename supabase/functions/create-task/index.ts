@@ -56,6 +56,66 @@ serve(async (req) => {
       );
     }
 
+    // Get user's plan to validate interval
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan_id")
+      .eq("id", user.id)
+      .single();
+
+    const planId = profile?.plan_id || "free";
+
+    // Validate interval based on plan limits
+    const intervalMatch = schedule_interval.match(/^(\d+)([mhd])$/);
+    if (!intervalMatch) {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid interval format. Use: 5m, 1h, 1d, etc.",
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const [, count, unit] = intervalMatch;
+    const numCount = parseInt(count, 10);
+    let intervalMinutes = 0;
+
+    switch (unit) {
+      case "m":
+        intervalMinutes = numCount;
+        break;
+      case "h":
+        intervalMinutes = numCount * 60;
+        break;
+      case "d":
+        intervalMinutes = numCount * 1440;
+        break;
+    }
+
+    // Plan limits (matching lib/plans.ts)
+    const planLimits: Record<string, number> = {
+      free: 60,      // 1 hour
+      starter: 15,   // 15 minutes
+      pro: 5,         // 5 minutes
+    };
+
+    const minIntervalMinutes = planLimits[planId] || 60;
+
+    if (intervalMinutes < minIntervalMinutes) {
+      return new Response(
+        JSON.stringify({
+          error: `Your ${planId} plan requires a minimum interval of ${minIntervalMinutes} minutes. Please increase the interval or upgrade your plan.`,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Calculate next_run_at based on schedule_interval
     const now = new Date();
     const nextRunAt = calculateNextRunTime(now, schedule_interval);

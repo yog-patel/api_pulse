@@ -22,8 +22,9 @@ export default function Settings() {
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [selectedType, setSelectedType] = useState<'email' | 'slack' | 'sms' | 'discord'>('email');
+  const [selectedType, setSelectedType] = useState<'email' | 'slack' | 'discord'>('slack');
   const [user, setUser] = useState<any>(null);
+  const [userPlan, setUserPlan] = useState<string>('free');
   const [testingId, setTestingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
@@ -33,7 +34,6 @@ export default function Settings() {
     email: '',
     slackWebhook: '',
     discordWebhook: '',
-    smsNumber: '',
   });
 
   useEffect(() => {
@@ -49,6 +49,25 @@ export default function Settings() {
     }
 
     setUser(session.user);
+
+    // Fetch user's plan
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('plan_id')
+        .eq('id', session.user.id)
+        .single();
+
+      if (!profileError && profile) {
+        setUserPlan(profile.plan_id || 'free');
+        // Set default selected type based on plan
+        if (profile.plan_id !== 'pro' && selectedType === 'email') {
+          setSelectedType('slack');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user plan:', error);
+    }
 
     try {
       const response = await fetch(
@@ -94,8 +113,6 @@ export default function Settings() {
       payload.credentials = { webhook_url: formData.slackWebhook };
     } else if (selectedType === 'discord') {
       payload.credentials = { webhook_url: formData.discordWebhook };
-    } else if (selectedType === 'sms') {
-      payload.credentials = { phone_number: formData.smsNumber };
     }
 
     try {
@@ -116,7 +133,7 @@ export default function Settings() {
       if (response.ok) {
         setIntegrations([...integrations, data]);
         setShowModal(false);
-        setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', smsNumber: '' });
+        setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '' });
         alert('Integration added successfully! Check your channel for a test message.');
       } else {
         console.error('Failed to create integration:', data);
@@ -173,8 +190,6 @@ export default function Settings() {
         return '💬';
       case 'discord':
         return '🎮';
-      case 'sms':
-        return '📱';
       default:
         return '🔔';
     }
@@ -320,13 +335,13 @@ export default function Settings() {
             <form onSubmit={handleAddIntegration} className="p-6 space-y-4">
               {/* Integration Type Tabs */}
               <div className="flex gap-2 mb-6">
-                {(['email', 'slack', 'discord', 'sms'] as const).map((type) => (
+                {(['slack', 'discord', ...(userPlan === 'pro' ? ['email'] : [])] as const).map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => {
                       setSelectedType(type);
-                      setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', smsNumber: '' });
+                      setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '' });
                     }}
                     className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors ${
                       selectedType === type
@@ -335,8 +350,17 @@ export default function Settings() {
                     }`}
                   >
                     {type.charAt(0).toUpperCase() + type.slice(1)}
+                    {type === 'email' && userPlan !== 'pro' && (
+                      <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Pro</span>
+                    )}
                   </button>
                 ))}
+                {userPlan !== 'pro' && (
+                  <div className="flex-1 px-4 py-2 rounded-lg bg-gray-50 text-gray-400 font-semibold flex items-center justify-center relative">
+                    Email
+                    <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded">Pro Only</span>
+                  </div>
+                )}
               </div>
 
               {/* Common Name Field */}
@@ -408,23 +432,6 @@ export default function Settings() {
                   <p className="text-xs text-gray-600 mt-2">
                     Get your webhook URL from Discord Server Settings → Integrations → Webhooks
                   </p>
-                </div>
-              )}
-
-              {/* SMS Fields */}
-              {selectedType === 'sms' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    value={formData.smsNumber}
-                    onChange={(e) => setFormData({ ...formData, smsNumber: e.target.value })}
-                    placeholder="+1 (555) 000-0000"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all"
-                    required
-                  />
                 </div>
               )}
 

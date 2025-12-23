@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { canCreateTask, getPlanLimits } from '../../../../lib/plans';
+import { canCreateTask, getPlanLimits, isIntervalAllowed, getAvailableIntervals } from '../../../../lib/plans';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -88,6 +88,24 @@ export default function CreateTask() {
     if (!canCreate) {
       const limits = getPlanLimits(userPlan);
       setError(`You've reached the maximum of ${limits.maxTasks} tasks for your ${userPlan} plan. Please upgrade to create more tasks.`);
+      return;
+    }
+
+    // Validate interval based on plan limits
+    const scheduleValue = parseInt(formData.schedule_value);
+    let intervalMinutes = 0;
+    
+    if (formData.schedule_unit === 'm') {
+      intervalMinutes = scheduleValue;
+    } else if (formData.schedule_unit === 'h') {
+      intervalMinutes = scheduleValue * 60;
+    } else if (formData.schedule_unit === 'd') {
+      intervalMinutes = scheduleValue * 1440;
+    }
+
+    if (!isIntervalAllowed(intervalMinutes, userPlan)) {
+      const limits = getPlanLimits(userPlan);
+      setError(`Your ${userPlan} plan requires a minimum interval of ${limits.minIntervalMinutes} minutes. Please increase the interval or upgrade your plan.`);
       return;
     }
 
@@ -252,7 +270,7 @@ export default function CreateTask() {
                   required
                   min="1"
                   disabled={!canCreate}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
                   placeholder="5"
                 />
                 <select
@@ -260,16 +278,47 @@ export default function CreateTask() {
                   value={formData.schedule_unit}
                   onChange={handleChange}
                   disabled={!canCreate}
-                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
                 >
                   <option value="m">Minutes</option>
                   <option value="h">Hours</option>
                   <option value="d">Days</option>
                 </select>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Minimum interval: {getPlanLimits(userPlan).minIntervalMinutes} minutes for {userPlan} plan
-              </p>
+              <div className="mt-2 space-y-1">
+                <p className="text-xs text-gray-500">
+                  Minimum interval: <span className="font-semibold text-purple-600">{getPlanLimits(userPlan).minIntervalMinutes} minutes</span> for {userPlan} plan
+                  {getPlanLimits(userPlan).minIntervalMinutes === 60 && ' (1 hour)'}
+                  {getPlanLimits(userPlan).minIntervalMinutes === 15 && ' (15 minutes)'}
+                  {getPlanLimits(userPlan).minIntervalMinutes === 5 && ' (5 minutes)'}
+                </p>
+                {(() => {
+                  const scheduleValue = parseInt(formData.schedule_value) || 0;
+                  let currentMinutes = 0;
+                  if (formData.schedule_unit === 'm') currentMinutes = scheduleValue;
+                  else if (formData.schedule_unit === 'h') currentMinutes = scheduleValue * 60;
+                  else if (formData.schedule_unit === 'd') currentMinutes = scheduleValue * 1440;
+                  
+                  const minRequired = getPlanLimits(userPlan).minIntervalMinutes;
+                  const isValid = currentMinutes >= minRequired;
+                  
+                  if (scheduleValue > 0 && !isValid) {
+                    return (
+                      <p className="text-xs text-red-600 font-medium">
+                        ⚠️ Interval too short. Minimum: {minRequired} minutes for {userPlan} plan.
+                      </p>
+                    );
+                  }
+                  if (scheduleValue > 0 && isValid) {
+                    return (
+                      <p className="text-xs text-green-600 font-medium">
+                        ✓ Interval meets plan requirements
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
             </div>
 
             {error && (
