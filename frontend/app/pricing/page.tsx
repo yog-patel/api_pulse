@@ -71,6 +71,9 @@ export default function Pricing() {
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Choose the plan that fits your monitoring needs
             </p>
+            <p className="text-sm text-gray-500 max-w-2xl mx-auto mt-2">
+              No credit card required
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -125,8 +128,8 @@ export default function Pricing() {
 
             {/* Starter Plan - Featured */}
             <div className="relative transform md:scale-105 z-10">
-              <div className="absolute -top-5 left-0 right-0 flex justify-center">
-                <span className="bg-black text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-black text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
                   Most Popular
                 </span>
               </div>
@@ -174,7 +177,7 @@ export default function Pricing() {
                 </ul>
              
                 <Link href="/auth/signup?plan=starter" className="block w-full text-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 font-semibold shadow-lg hover:shadow-xl transition-all">
-                  Start 14-Day Trial
+                  Get Started
                 </Link>
               </div>
             </div>
@@ -230,16 +233,11 @@ export default function Pricing() {
               </ul>
               
               <Link href="/auth/signup?plan=pro" className="block w-full text-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 font-semibold transition-colors">
-                Start 14-Day Trial
+                Get Started
               </Link>
             </div>
           </div>
           
-          <div className="text-center mt-12">
-            <p className="text-gray-600">
-              All plans include a <strong className="text-gray-900">14-day free trial</strong> • No credit card required
-            </p>
-          </div>
         </div>
       </section>
     </div>

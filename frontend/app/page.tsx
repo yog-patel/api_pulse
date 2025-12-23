@@ -109,48 +109,6 @@ export default function Home() {
             </div>
           </div>
           
-          {/* Hero Visual */}
-          <div className="mt-20 max-w-5xl mx-auto relative">
-            <div className="relative bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl border-2 border-purple-100 p-8 md:p-12 shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
-              {/* Decorative elements */}
-              <div className="absolute top-4 right-4 w-20 h-20 bg-purple-200 rounded-full blur-2xl opacity-50"></div>
-              <div className="absolute bottom-4 left-4 w-32 h-32 bg-blue-200 rounded-full blur-3xl opacity-50"></div>
-              
-              <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center group">
-                  <div className="w-20 h-20 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-                    <span className="text-white font-bold text-2xl">1</span>
-                  </div>
-                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Add API URL</h3>
-                  <p className="text-sm text-gray-600">Paste your endpoint in seconds</p>
-                </div>
-                <div className="hidden md:flex items-center justify-center">
-                  <div className="w-16 h-1 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full"></div>
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mx-1 animate-pulse"></div>
-                  <div className="w-16 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
-                </div>
-                <div className="text-center group">
-                  <div className="w-20 h-20 gradient-secondary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-                    <span className="text-white font-bold text-2xl">2</span>
-                  </div>
-                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Set Schedule</h3>
-                  <p className="text-sm text-gray-600">Choose your interval</p>
-                </div>
-                <div className="hidden md:flex items-center justify-center">
-                  <div className="w-16 h-1 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full"></div>
-                  <div className="w-2 h-2 bg-purple-500 rounded-full mx-1 animate-pulse"></div>
-                  <div className="w-16 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
-                </div>
-                <div className="text-center group">
-                  <div className="w-20 h-20 gradient-accent rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-                    <span className="text-white font-bold text-2xl">3</span>
-                  </div>
-                  <h3 className="font-bold text-gray-900 mb-2 text-lg">Get Results</h3>
-                  <p className="text-sm text-gray-600">Automated delivery & logging</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -368,13 +326,10 @@ export default function Home() {
             <div className="inline-block px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-sm font-semibold mb-4">
               Simple Pricing
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 pb-4">
               Choose the plan that
               <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"> fits you</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              All plans include a 14-day free trial • No credit card required
-            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -414,7 +369,7 @@ export default function Home() {
                     <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-gray-700">Dashboard view only (no notifications)</span>
+                    <span className="text-gray-700">Dashboard only</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -432,8 +387,8 @@ export default function Home() {
 
             {/* Starter Plan - Featured */}
             <div className="relative transform md:scale-105 z-10">
-              <div className="absolute -top-5 left-0 right-0 flex justify-center">
-                <span className="gradient-primary text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl">
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2">
+                <span className="gradient-primary text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl whitespace-nowrap">
                   Most Popular
                 </span>
               </div>
@@ -484,7 +439,7 @@ export default function Home() {
                   </ul>
                
                   <Link href="/auth/signup?plan=starter" className="block w-full text-center px-6 py-3 gradient-primary text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200 glow-hover">
-                    Start 14-Day Trial
+                    Get Started
                   </Link>
                 </div>
               </div>
@@ -526,7 +481,7 @@ export default function Home() {
                     <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-gray-700">Email, Slack & Discord</span>
+                    <span className="text-gray-700">Email, Slack, Discord and custom webhooks </span>
                   </li>
                   <li className="flex items-start">
                     <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -534,16 +489,10 @@ export default function Home() {
                     </svg>
                     <span className="text-gray-700"><strong className="text-gray-900">30 day</strong> history</span>
                   </li>
-                  <li className="flex items-start">
-                    <svg className="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Priority support</span>
-                  </li>
                 </ul>
                 
                 <Link href="/auth/signup?plan=pro" className="block w-full text-center px-6 py-3 gradient-accent text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200">
-                  Start 14-Day Trial
+                  Get Started
                 </Link>
               </div>
             </div>
@@ -735,7 +684,7 @@ export default function Home() {
             Ready to automate?
           </h2>
           <p className="text-purple-100 mb-10 text-xl leading-relaxed">
-            Start scheduling your API calls in seconds. No credit card required.
+            Start scheduling your API calls in seconds.
           </p>
           <Link 
             href="/auth/signup" 
