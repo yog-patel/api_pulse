@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import { PLANS } from '../lib/plans';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -11,6 +13,8 @@ const supabase = createClient(
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -19,6 +23,61 @@ export default function Home() {
     };
     checkAuth();
   }, []);
+
+  const handleCheckout = async (planId: 'starter' | 'pro') => {
+    if (!isLoggedIn) {
+      router.push(`/auth/signup?plan=${planId}`);
+      return;
+    }
+
+    setLoading(planId);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push(`/auth/login?redirect=/&plan=${planId}`);
+        return;
+      }
+
+      const plan = PLANS[planId.toUpperCase() as 'STARTER' | 'PRO'];
+      if (!plan.priceId) {
+        alert('This plan is not available for checkout. Please contact support.');
+        setLoading(null);
+        return;
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-checkout-session`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            priceId: plan.priceId,
+            planId: plan.id,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.error || 'Failed to create checkout session');
+        setLoading(null);
+        return;
+      }
+
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error: any) {
+      console.error('Checkout error:', error);
+      alert('An error occurred. Please try again.');
+      setLoading(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
@@ -438,9 +497,13 @@ export default function Home() {
                     </li>
                   </ul>
                
-                  <Link href="/auth/signup?plan=starter" className="block w-full text-center px-6 py-3 gradient-primary text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200 glow-hover">
-                    Get Started
-                  </Link>
+                  <button
+                    onClick={() => handleCheckout('starter')}
+                    disabled={loading === 'starter'}
+                    className="w-full px-6 py-3 gradient-primary text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200 glow-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading === 'starter' ? 'Processing...' : 'Get Started'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -491,9 +554,13 @@ export default function Home() {
                   </li>
                 </ul>
                 
-                <Link href="/auth/signup?plan=pro" className="block w-full text-center px-6 py-3 gradient-accent text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200">
-                  Get Started
-                </Link>
+                <button
+                  onClick={() => handleCheckout('pro')}
+                  disabled={loading === 'pro'}
+                  className="w-full px-6 py-3 gradient-accent text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading === 'pro' ? 'Processing...' : 'Get Started'}
+                </button>
               </div>
             </div>
           </div>

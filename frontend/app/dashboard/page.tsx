@@ -46,6 +46,18 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
+    // Check for Stripe checkout success
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    if (sessionId) {
+      // Remove session_id from URL
+      window.history.replaceState({}, document.title, '/dashboard');
+      // Show success message
+      setTimeout(() => {
+        alert('Payment successful! Your subscription has been activated.');
+      }, 500);
+    }
+
     const checkAuthAndFetchTasks = async () => {
       const { data: { session } } = await supabase.auth.getSession();
 
@@ -318,6 +330,12 @@ export default function Dashboard() {
             </Link>
             <div className="flex items-center space-x-6">
               <span className="text-sm text-gray-700 font-medium">{user?.email}</span>
+              <Link
+                href="/dashboard/billing"
+                className="text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
+              >
+                Billing
+              </Link>
               <Link
                 href="/dashboard/settings"
                 className="text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
