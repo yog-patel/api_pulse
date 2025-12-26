@@ -14,12 +14,30 @@ const supabase = createClient(
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsLoggedIn(!!session);
+      
+      // Fetch current plan if logged in
+      if (session?.user?.id) {
+        try {
+          const { data } = await supabase
+            .from('profiles')
+            .select('plan_id')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (data?.plan_id) {
+            setCurrentPlan(data.plan_id);
+          }
+        } catch (err) {
+          console.error('Error fetching plan:', err);
+        }
+      }
     };
     checkAuth();
   }, []);
@@ -396,6 +414,13 @@ export default function Home() {
             <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-purple-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-purple-100 rounded-full -mr-16 -mt-16 opacity-50"></div>
               <div className="relative">
+                {isLoggedIn && currentPlan === 'free' && (
+                  <div className="mb-4">
+                    <span className="bg-gray-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      CURRENT PLAN
+                    </span>
+                  </div>
+                )}
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
                   <p className="text-gray-600 text-sm mb-6">Perfect for personal projects</p>
@@ -438,15 +463,21 @@ export default function Home() {
                   </li>
                 </ul>
         
-                <Link href="/auth/signup" className="block w-full text-center px-6 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 font-semibold transition-colors">
-                  Start Free
-                </Link>
+                {isLoggedIn && currentPlan === 'free' ? (
+                  <button disabled className="block w-full text-center px-6 py-3 bg-gray-100 text-gray-900 rounded-lg font-semibold cursor-not-allowed opacity-50">
+                    Current Plan
+                  </button>
+                ) : (
+                  <Link href="/auth/signup" className="block w-full text-center px-6 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 font-semibold transition-colors">
+                    Start Free
+                  </Link>
+                )}
               </div>
             </div>
 
             {/* Starter Plan - Featured */}
             <div className="relative transform md:scale-105 z-10">
-              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2">
+              <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 z-20">
                 <span className="gradient-primary text-white px-6 py-2 rounded-full text-sm font-bold shadow-xl whitespace-nowrap">
                   Most Popular
                 </span>
@@ -455,6 +486,13 @@ export default function Home() {
                 <div className="absolute top-0 right-0 w-40 h-40 bg-purple-200 rounded-full -mr-20 -mt-20 opacity-50 blur-2xl"></div>
                 <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-200 rounded-full -ml-20 -mb-20 opacity-50 blur-2xl"></div>
                 <div className="relative">
+                  {isLoggedIn && currentPlan === 'starter' && (
+                    <div className="mb-4">
+                      <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                        CURRENT PLAN
+                      </span>
+                    </div>
+                  )}
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">Starter</h3>
                     <p className="text-gray-600 text-sm mb-6">Great for small teams</p>
@@ -499,10 +537,10 @@ export default function Home() {
                
                   <button
                     onClick={() => handleCheckout('starter')}
-                    disabled={loading === 'starter'}
+                    disabled={loading === 'starter' || (isLoggedIn && currentPlan === 'starter')}
                     className="w-full px-6 py-3 gradient-primary text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200 glow-hover disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading === 'starter' ? 'Processing...' : 'Get Started'}
+                    {isLoggedIn && currentPlan === 'starter' ? 'Current Plan' : loading === 'starter' ? 'Processing...' : 'Get Started'}
                   </button>
                 </div>
               </div>
@@ -510,8 +548,22 @@ export default function Home() {
 
             {/* Pro Plan */}
             <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden">
+              {isLoggedIn && currentPlan === 'pro' && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                    CURRENT
+                  </span>
+                </div>
+              )}
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full -mr-16 -mt-16 opacity-50"></div>
               <div className="relative">
+                {isLoggedIn && currentPlan === 'pro' && (
+                  <div className="mb-4">
+                    <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                      CURRENT PLAN
+                    </span>
+                  </div>
+                )}
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
                   <p className="text-gray-600 text-sm mb-6">Full-featured monitoring</p>
@@ -556,10 +608,10 @@ export default function Home() {
                 
                 <button
                   onClick={() => handleCheckout('pro')}
-                  disabled={loading === 'pro'}
+                  disabled={loading === 'pro' || (isLoggedIn && currentPlan === 'pro')}
                   className="w-full px-6 py-3 gradient-accent text-white rounded-lg hover:shadow-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading === 'pro' ? 'Processing...' : 'Get Started'}
+                  {isLoggedIn && currentPlan === 'pro' ? 'Current Plan' : loading === 'pro' ? 'Processing...' : 'Get Started'}
                 </button>
               </div>
             </div>

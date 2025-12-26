@@ -14,12 +14,48 @@ const supabase = createClient(
 export default function Pricing() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
+      console.log('=== Pricing Page Loaded ===');
+      
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('Session:', session?.user?.id);
       setIsLoggedIn(!!session);
+      
+      // Fetch current plan if logged in
+      if (session?.user?.id) {
+        try {
+          console.log('Fetching plan for user:', session.user.id);
+          
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('plan_id')
+            .eq('id', session.user.id)
+            .single();
+          
+          console.log('Supabase response:', { data, error });
+          
+          if (error) {
+            console.error('Error fetching plan:', error);
+          } else {
+            console.log('Profile data:', data);
+            console.log('plan_id value:', data?.plan_id);
+            if (data?.plan_id) {
+              setCurrentPlan(data.plan_id);
+              console.log('Set current plan to:', data.plan_id);
+            } else {
+              console.log('plan_id is null or undefined');
+            }
+          }
+        } catch (err) {
+          console.error('Exception fetching plan:', err);
+        }
+      } else {
+        console.log('No session found - not logged in');
+      }
     };
     checkAuth();
   }, []);
@@ -137,7 +173,14 @@ export default function Pricing() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Free Plan */}
-            <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-gray-300 transition-all duration-300">
+            <div className="relative bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-gray-300 transition-all duration-300">
+              {isLoggedIn && currentPlan === 'free' && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-gray-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                    CURRENT
+                  </span>
+                </div>
+              )}
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Free</h3>
                 <p className="text-gray-600 text-sm mb-6">Perfect for personal projects</p>
@@ -187,10 +230,15 @@ export default function Pricing() {
 
             {/* Starter Plan - Featured */}
             <div className="relative transform md:scale-105 z-10">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
                 <span className="bg-black text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
                   Most Popular
                 </span>
+                {currentPlan === 'starter' && (
+                  <span className="bg-green-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                    CURRENT
+                  </span>
+                )}
               </div>
               <div className="bg-white rounded-2xl p-8 border-2 border-black shadow-2xl hover:shadow-3xl transition-all duration-300 h-full">
                 <div className="text-center mb-6">
@@ -246,7 +294,14 @@ export default function Pricing() {
             </div>
 
             {/* Pro Plan */}
-            <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-gray-300 transition-all duration-300">
+            <div className="relative bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-gray-300 transition-all duration-300">
+              {currentPlan === 'pro' && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                    CURRENT
+                  </span>
+                </div>
+              )}
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
                 <p className="text-gray-600 text-sm mb-6">Full-featured monitoring</p>
