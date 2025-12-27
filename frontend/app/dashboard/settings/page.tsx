@@ -149,7 +149,7 @@ export default function Settings() {
       if (response.ok) {
         setIntegrations([...integrations, data]);
         setShowModal(false);
-        setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '' });
+        setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', webhookUrl: '' });
         setAlertModal({ isOpen: true, message: 'Integration added successfully! Check your channel for a test message.', type: 'success', title: 'Success' });
       } else {
         console.error('Failed to create integration:', data);
