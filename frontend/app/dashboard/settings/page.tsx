@@ -27,7 +27,6 @@ export default function Settings() {
   const [selectedType, setSelectedType] = useState<'email' | 'slack' | 'discord' | 'webhook'>('slack');
   const [user, setUser] = useState<any>(null);
   const [userPlan, setUserPlan] = useState<string>('free');
-  const [testingId, setTestingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [alertModal, setAlertModal] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' | 'info'; title?: string }>({ isOpen: false, message: '', type: 'info' });
   const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void; isDangerous?: boolean }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, isDangerous: false });
