@@ -1,9 +1,9 @@
 name: API-Pulse-Scheduler
 
 on:
-  schedule:
+  #schedule:
     # Run every minute
-    - cron: '* * * * *'
+    #- cron: '* * * * *'
   workflow_dispatch: # Allow manual trigger for testing
 
 jobs:
