@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import { PLANS } from '../../lib/plans';
+import Modal from '../../components/Modal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -15,6 +16,7 @@ export default function Pricing() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
+  const [modal, setModal] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' | 'info'; title?: string }>({ isOpen: false, message: '', type: 'info' });
   const router = useRouter();
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export default function Pricing() {
 
       const plan = PLANS[planId.toUpperCase() as 'STARTER' | 'PRO'];
       if (!plan.priceId) {
-        alert('This plan is not available for checkout. Please contact support.');
+        setModal({ isOpen: true, message: 'This plan is not available for checkout. Please contact support.', type: 'error', title: 'Error' });
         setLoading(null);
         return;
       }
@@ -99,7 +101,7 @@ export default function Pricing() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error.error || 'Failed to create checkout session');
+        setModal({ isOpen: true, message: error.error || 'Failed to create checkout session', type: 'error', title: 'Error' });
         setLoading(null);
         return;
       }
@@ -110,12 +112,14 @@ export default function Pricing() {
       }
     } catch (error: any) {
       console.error('Checkout error:', error);
-      alert('An error occurred. Please try again.');
+      setModal({ isOpen: true, message: 'An error occurred. Please try again.', type: 'error', title: 'Error' });
       setLoading(null);
     }
   };
 
   return (
+    <>
+    <Modal isOpen={modal.isOpen} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({ ...modal, isOpen: false })} />
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
@@ -363,6 +367,7 @@ export default function Pricing() {
         </div>
       </section>
     </div>
+    </>
   );
 }
 

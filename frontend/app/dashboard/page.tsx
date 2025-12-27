@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import UsageIndicator from '../../components/UsageIndicator';
+import Modal from '../../components/Modal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -32,6 +34,8 @@ export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [togglingTaskId, setTogglingTaskId] = useState<string | null>(null);
+  const [modal, setModal] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' | 'info'; title?: string }>({ isOpen: false, message: '', type: 'info' });
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void; isDangerous?: boolean }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, isDangerous: false });
   
   // Notification modal state
   const [showNotificationModal, setShowNotificationModal] = useState(false);
@@ -54,7 +58,7 @@ export default function Dashboard() {
       window.history.replaceState({}, document.title, '/dashboard');
       // Show success message
       setTimeout(() => {
-        alert('Payment successful! Your subscription has been activated.');
+        setModal({ isOpen: true, message: 'Payment successful! Your subscription has been activated.', type: 'success', title: 'Success' });
       }, 500);
     }
 
@@ -104,41 +108,44 @@ export default function Dashboard() {
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    if (!confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Task',
+      message: 'Are you sure you want to delete this task?',
+      isDangerous: true,
+      onConfirm: async () => {
+        setDeletingTaskId(taskId);
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) {
+            router.push('/auth/login');
+            return;
+          }
 
-    setDeletingTaskId(taskId);
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/delete-task/${taskId}`,
+            {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
 
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push('/auth/login');
-        return;
-      }
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/delete-task/${taskId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json',
-          },
+          if (response.ok) {
+            setTasks(tasks.filter((task: any) => task.id !== taskId));
+          } else {
+            setModal({ isOpen: true, message: 'Failed to delete task', type: 'error', title: 'Error' });
+          }
+        } catch (error) {
+          console.error('Error deleting task:', error);
+          setModal({ isOpen: true, message: 'An error occurred while deleting the task', type: 'error', title: 'Error' });
+        } finally {
+          setDeletingTaskId(null);
         }
-      );
-
-      if (response.ok) {
-        setTasks(tasks.filter((task: any) => task.id !== taskId));
-      } else {
-        alert('Failed to delete task');
       }
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      alert('An error occurred while deleting the task');
-    } finally {
-      setDeletingTaskId(null);
-    }
+    });
   };
 
   const handleToggleTask = async (taskId: string, currentStatus: boolean) => {
@@ -169,11 +176,11 @@ export default function Dashboard() {
           task.id === taskId ? updatedTask : task
         ));
       } else {
-        alert('Failed to update task status');
+        setModal({ isOpen: true, message: 'Failed to update task status', type: 'error', title: 'Error' });
       }
     } catch (error) {
       console.error('Error toggling task:', error);
-      alert('An error occurred while updating the task');
+      setModal({ isOpen: true, message: 'An error occurred while updating the task', type: 'error', title: 'Error' });
     } finally {
       setTogglingTaskId(null);
     }
@@ -226,7 +233,7 @@ export default function Dashboard() {
 
   const handleAddNotification = async () => {
     if (!selectedIntegration) {
-      alert('Please select an integration');
+      setModal({ isOpen: true, message: 'Please select an integration', type: 'error', title: 'Error' });
       return;
     }
 
@@ -256,43 +263,49 @@ export default function Dashboard() {
         openNotificationModal(selectedTask);
         setSelectedIntegration('');
         setIncludeResponse(false);
-        alert('Notification added successfully!');
+        setModal({ isOpen: true, message: 'Notification added successfully!', type: 'success', title: 'Success' });
       } else {
         const error = await response.json();
-        alert(`Failed to add notification: ${error.error || 'Unknown error'}`);
+        setModal({ isOpen: true, message: `Failed to add notification: ${error.error || 'Unknown error'}`, type: 'error', title: 'Error' });
       }
     } catch (error) {
       console.error('Error adding notification:', error);
-      alert('An error occurred while adding the notification');
+      setModal({ isOpen: true, message: 'An error occurred while adding the notification', type: 'error', title: 'Error' });
     }
   };
 
   const handleRemoveNotification = async (linkId: string) => {
-    if (!confirm('Remove this notification?')) return;
+    setConfirmModal({
+      isOpen: true,
+      title: 'Remove Notification',
+      message: 'Remove this notification?',
+      isDangerous: true,
+      onConfirm: async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/link-task-notification/${linkId}`,
+            {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            }
+          );
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/link-task-notification/${linkId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
+          if (response.ok) {
+            setTaskNotifications(taskNotifications.filter(n => n.id !== linkId));
+          } else {
+            setModal({ isOpen: true, message: 'Failed to remove notification', type: 'error', title: 'Error' });
+          }
+        } catch (error) {
+          console.error('Error removing notification:', error);
+          setModal({ isOpen: true, message: 'An error occurred while removing the notification', type: 'error', title: 'Error' });
         }
-      );
-
-      if (response.ok) {
-        setTaskNotifications(taskNotifications.filter(n => n.id !== linkId));
-      } else {
-        alert('Failed to remove notification');
       }
-    } catch (error) {
-      console.error('Error removing notification:', error);
-      alert('An error occurred while removing the notification');
-    }
+    });
   };
 
   const getNotificationBadge = (notifyOn: string) => {
@@ -317,6 +330,16 @@ export default function Dashboard() {
   }
 
   return (
+    <>
+    <Modal isOpen={modal.isOpen} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({ ...modal, isOpen: false })} />
+    <ConfirmModal 
+      isOpen={confirmModal.isOpen} 
+      title={confirmModal.title} 
+      message={confirmModal.message} 
+      isDangerous={confirmModal.isDangerous}
+      onConfirm={confirmModal.onConfirm} 
+      onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false })} 
+    />
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="glass border-b border-gray-200/50 sticky top-0 z-40 backdrop-blur-md bg-white/80">
@@ -616,5 +639,6 @@ export default function Dashboard() {
         </div>
       )}
     </div>
+    </>
   );
 }

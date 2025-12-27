@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
+import Modal from '../../../components/Modal';
+import ConfirmModal from '../../../components/ConfirmModal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -27,6 +29,8 @@ export default function Settings() {
   const [userPlan, setUserPlan] = useState<string>('free');
   const [testingId, setTestingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [alertModal, setAlertModal] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' | 'info'; title?: string }>({ isOpen: false, message: '', type: 'info' });
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void; isDangerous?: boolean }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, isDangerous: false });
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -147,52 +151,58 @@ export default function Settings() {
         setIntegrations([...integrations, data]);
         setShowModal(false);
         setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '' });
-        alert('Integration added successfully! Check your channel for a test message.');
+        setAlertModal({ isOpen: true, message: 'Integration added successfully! Check your channel for a test message.', type: 'success', title: 'Success' });
       } else {
         console.error('Failed to create integration:', data);
-        alert(`Failed to create integration: ${data.error || 'Unknown error'}`);
+        setAlertModal({ isOpen: true, message: `Failed to create integration: ${data.error || 'Unknown error'}`, type: 'error', title: 'Error' });
       }
     } catch (error) {
       console.error('Error creating integration:', error);
-      alert('An error occurred while creating the integration. Please check the console for details.');
+      setAlertModal({ isOpen: true, message: 'An error occurred while creating the integration. Please check the console for details.', type: 'error', title: 'Error' });
     }
   };
 
   const handleTestIntegration = async (integrationId: string) => {
-    alert('Slack integrations are automatically tested when you add them. Check your channel for the test message!');
+    setAlertModal({ isOpen: true, message: 'Slack integrations are automatically tested when you add them. Check your channel for the test message!', type: 'info', title: 'Info' });
   };
 
   const handleDeleteIntegration = async (integrationId: string) => {
-    if (!confirm('Are you sure you want to delete this integration?')) return;
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Integration',
+      message: 'Are you sure you want to delete this integration?',
+      isDangerous: true,
+      onConfirm: async () => {
+        setDeletingId(integrationId);
 
-    setDeletingId(integrationId);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
 
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/manage-integrations/${integrationId}`,
-        {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/manage-integrations/${integrationId}`,
+            {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${session.access_token}`,
             'Content-Type': 'application/json',
           },
-        }
-      );
+            }
+          );
 
-      if (response.ok) {
-        setIntegrations(integrations.filter(i => i.id !== integrationId));
-      } else {
-        alert('Failed to delete integration');
+          if (response.ok) {
+            setIntegrations(integrations.filter(i => i.id !== integrationId));
+          } else {
+            setAlertModal({ isOpen: true, message: 'Failed to delete integration', type: 'error', title: 'Error' });
+          }
+        } catch (error) {
+          console.error('Error deleting integration:', error);
+          setAlertModal({ isOpen: true, message: 'An error occurred while deleting the integration', type: 'error', title: 'Error' });
+        } finally {
+          setDeletingId(null);
+        }
       }
-    } catch (error) {
-      console.error('Error deleting integration:', error);
-      alert('An error occurred while deleting the integration');
-    } finally {
-      setDeletingId(null);
-    }
+    });
   };
 
   const getIntegrationIcon = (type: string) => {
@@ -222,6 +232,16 @@ export default function Settings() {
   }
 
   return (
+    <>
+    <Modal isOpen={alertModal.isOpen} title={alertModal.title} message={alertModal.message} type={alertModal.type} onClose={() => setAlertModal({ ...alertModal, isOpen: false })} />
+    <ConfirmModal 
+      isOpen={confirmModal.isOpen} 
+      title={confirmModal.title} 
+      message={confirmModal.message} 
+      isDangerous={confirmModal.isDangerous}
+      onConfirm={confirmModal.onConfirm} 
+      onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false })} 
+    />
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -543,5 +563,6 @@ export default function Settings() {
         </div>
       )}
     </div>
+    </>
   );
 }

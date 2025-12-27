@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import { PLANS, getPlan } from '../../../lib/plans';
+import Modal from '../../../components/Modal';
+import ConfirmModal from '../../../components/ConfirmModal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -15,6 +17,8 @@ export default function Billing() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [modal, setModal] = useState<{ isOpen: boolean; message: string; type: 'success' | 'error' | 'info'; title?: string }>({ isOpen: false, message: '', type: 'info' });
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void; isDangerous?: boolean }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, isDangerous: false });
   const router = useRouter();
 
   useEffect(() => {
@@ -54,7 +58,7 @@ export default function Billing() {
 
       const plan = PLANS[planId.toUpperCase() as 'STARTER' | 'PRO'];
       if (!plan.priceId) {
-        alert('This plan is not available for checkout.');
+        setModal({ isOpen: true, message: 'This plan is not available for checkout.', type: 'error', title: 'Error' });
         setCheckoutLoading(null);
         return;
       }
@@ -76,7 +80,7 @@ export default function Billing() {
 
       if (!response.ok) {
         const error = await response.json();
-        alert(error.error || 'Failed to create checkout session');
+        setModal({ isOpen: true, message: error.error || 'Failed to create checkout session', type: 'error', title: 'Error' });
         setCheckoutLoading(null);
         return;
       }
@@ -87,27 +91,31 @@ export default function Billing() {
       }
     } catch (error: any) {
       console.error('Checkout error:', error);
-      alert('An error occurred. Please try again.');
+      setModal({ isOpen: true, message: 'An error occurred. Please try again.', type: 'error', title: 'Error' });
       setCheckoutLoading(null);
     }
   };
 
   const handleCancelSubscription = async () => {
-    if (!confirm('Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.')) {
-      return;
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Cancel Subscription',
+      message: 'Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing period.',
+      isDangerous: true,
+      onConfirm: async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
 
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      // In a real implementation, you would call Stripe API to cancel the subscription
-      // For now, we'll just show a message
-      alert('To cancel your subscription, please contact support or manage it through your Stripe customer portal.');
-    } catch (error) {
-      console.error('Error canceling subscription:', error);
-      alert('Failed to cancel subscription. Please try again.');
-    }
+          // In a real implementation, you would call Stripe API to cancel the subscription
+          // For now, we'll just show a message
+          setModal({ isOpen: true, message: 'To cancel your subscription, please contact support or manage it through your Stripe customer portal.', type: 'info', title: 'Info' });
+        } catch (error) {
+          console.error('Error canceling subscription:', error);
+          setModal({ isOpen: true, message: 'Failed to cancel subscription. Please try again.', type: 'error', title: 'Error' });
+        }
+      }
+    });
   };
 
   if (loading) {
@@ -125,6 +133,16 @@ export default function Billing() {
   const isPaidPlan = profile?.plan_id !== 'free';
 
   return (
+    <>
+    <Modal isOpen={modal.isOpen} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({ ...modal, isOpen: false })} />
+    <ConfirmModal 
+      isOpen={confirmModal.isOpen} 
+      title={confirmModal.title} 
+      message={confirmModal.message} 
+      isDangerous={confirmModal.isDangerous}
+      onConfirm={confirmModal.onConfirm} 
+      onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false })} 
+    />
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -301,6 +319,7 @@ export default function Billing() {
         )}
       </main>
     </div>
+    </>
   );
 }
 
