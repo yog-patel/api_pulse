@@ -109,7 +109,7 @@ export default function Settings() {
 
     // Prevent free users from adding integrations
     if (userPlan === 'free') {
-      setError('Free plan users can only view logs in the dashboard. Please upgrade to add notification integrations.');
+      setAlertModal({ isOpen: true, message: 'Free plan users can only view logs in the dashboard. Please upgrade to add notification integrations.', type: 'error' });
       return;
     }
 
