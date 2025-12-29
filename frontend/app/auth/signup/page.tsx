@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Modal from '../../../components/Modal';
 
@@ -19,7 +18,6 @@ export default function SignUp() {
   const [error, setError] = useState('');
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState('');
-  const router = useRouter();
 
   const getErrorMessage = (errorMessage: string): string => {
     // Handle specific error cases with user-friendly messages
