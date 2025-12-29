@@ -6,10 +6,6 @@
 [build.environment]
   NODE_VERSION = "22"
 
-[build.processing]
-  skip_processing = false
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
+# Tell Netlify to ignore public keys
+[context.production.environment]
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_STRIPE_PRO_PRICE_ID,NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID"
