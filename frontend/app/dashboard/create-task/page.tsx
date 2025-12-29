@@ -394,7 +394,7 @@ export default function CreateTask() {
               <label htmlFor="schedule" className="block text-sm font-medium text-gray-700 mb-2">
                 Schedule Interval
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="number"
                   name="schedule_value"
@@ -411,7 +411,7 @@ export default function CreateTask() {
                   value={formData.schedule_unit}
                   onChange={handleChange}
                   disabled={!canCreate}
-                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
+                  className="w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed transition-all"
                 >
                   <option value="m">Minutes</option>
                   <option value="h">Hours</option>

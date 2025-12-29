@@ -345,29 +345,29 @@ export default function Dashboard() {
       <header className="glass border-b border-gray-200/50 sticky top-0 z-40 backdrop-blur-md bg-white/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center space-x-2 group">
-              <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg">
+            <Link href="/" className="flex items-center space-x-2 group min-w-fit">
+              <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg flex-shrink-0">
                 <span className="text-white font-bold text-sm">AP</span>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">API Pulse</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent hidden sm:inline">API Pulse</span>
             </Link>
-            <div className="flex items-center space-x-6">
-              <span className="text-sm text-gray-700 font-medium">{user?.email}</span>
+            <div className="flex items-center space-x-3 sm:space-x-6">
+              <span className="text-xs sm:text-sm text-gray-700 font-medium truncate max-w-xs">{user?.email}</span>
               <Link
                 href="/dashboard/billing"
-                className="text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="hidden sm:block text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Billing
               </Link>
               <Link
                 href="/dashboard/settings"
-                className="text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="text-xs sm:text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Settings
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
+                className="text-xs sm:text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors"
               >
                 Sign Out
               </button>
@@ -376,19 +376,19 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Usage Indicator */}
         <UsageIndicator />
         
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">API Tasks</h1>
-            <p className="text-gray-600 mt-1">Manage your scheduled API calls</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">API Tasks</h1>
+            <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage your scheduled API calls</p>
           </div>
           <Link
             href="/dashboard/create-task"
-            className="px-6 py-3 gradient-primary text-white rounded-xl hover:shadow-xl hover:scale-105 font-semibold transition-all duration-200 shadow-lg glow-hover"
+            className="w-full sm:w-auto px-4 sm:px-6 py-3 gradient-primary text-white rounded-xl hover:shadow-xl hover:scale-105 font-semibold transition-all duration-200 shadow-lg glow-hover text-center text-sm sm:text-base"
           >
             Create New Task
           </Link>
@@ -396,7 +396,7 @@ export default function Dashboard() {
 
         {/* Tasks Table */}
         {tasks.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <div className="bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -412,110 +412,109 @@ export default function Dashboard() {
             </Link>
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Task Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">API URL</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Method</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Schedule</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {tasks.map((task: any) => (
-                    <tr key={task.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">{task.task_name}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600 truncate max-w-xs font-mono">{task.api_url}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex px-2 py-1 rounded text-xs font-semibold ${
-                          task.method === 'GET' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-                        }`}>
-                          {task.method}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600">{task.schedule_interval}</div>
-                      </td>
-                      <td className="px-6 py-4">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+            <table className="w-full min-w-max">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Task Name</th>
+                  <th className="hidden sm:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">API URL</th>
+                  <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Method</th>
+                  <th className="hidden md:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Schedule</th>
+                  <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                  <th className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {tasks.map((task: any) => (
+                  <tr key={task.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="text-sm font-medium text-gray-900">{task.task_name}</div>
+                      <div className="hidden sm:block text-xs text-gray-600 truncate max-w-xs font-mono mt-1">{task.api_url}</div>
+                    </td>
+                    <td className="hidden sm:table-cell px-6 py-4">
+                      <div className="text-sm text-gray-600 truncate max-w-xs font-mono">{task.api_url}</div>
+                    </td>
+                    <td className="px-4 sm:px-6 py-4">
+                      <span className={`inline-flex px-2 py-1 rounded text-xs font-semibold ${
+                        task.method === 'GET' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                      }`}>
+                        {task.method}
+                      </span>
+                    </td>
+                    <td className="hidden md:table-cell px-6 py-4">
+                      <div className="text-sm text-gray-600">{task.schedule_interval}</div>
+                    </td>
+                    <td className="px-4 sm:px-6 py-4">
+                      <button
+                        onClick={() => handleToggleTask(task.id, task.is_active)}
+                        disabled={togglingTaskId === task.id}
+                        className={`inline-flex px-2 sm:px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                          task.is_active
+                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        } disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap`}
+                      >
+                        {togglingTaskId === task.id ? 'Updating...' : (task.is_active ? '▶ Active' : '⏸ Paused')}
+                      </button>
+                    </td>
+                    <td className="px-4 sm:px-6 py-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
                         <button
-                          onClick={() => handleToggleTask(task.id, task.is_active)}
-                          disabled={togglingTaskId === task.id}
-                          className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                            task.is_active
-                              ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          onClick={() => openNotificationModal(task)}
+                          className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
                         >
-                          {togglingTaskId === task.id ? 'Updating...' : (task.is_active ? '▶ Active' : '⏸ Paused')}
+                          🔔 Notify
                         </button>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-3">
-                          <button
-                            onClick={() => openNotificationModal(task)}
-                            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                          >
-                            🔔 Notifications
-                          </button>
-                          <Link
-                            href={`/dashboard/task/${task.id}/logs`}
-                            className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                          >
-                            View Logs
-                          </Link>
-                          <button
-                            onClick={() => handleDeleteTask(task.id)}
-                            disabled={deletingTaskId === task.id}
-                            className="text-sm text-red-600 hover:text-red-900 disabled:text-gray-400 transition-colors"
-                          >
-                            {deletingTaskId === task.id ? 'Deleting...' : 'Delete'}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <Link
+                          href={`/dashboard/task/${task.id}/logs`}
+                          className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap"
+                        >
+                          Logs
+                        </Link>
+                        <button
+                          onClick={() => handleDeleteTask(task.id)}
+                          disabled={deletingTaskId === task.id}
+                          className="text-xs sm:text-sm text-red-600 hover:text-red-900 disabled:text-gray-400 transition-colors"
+                        >
+                          {deletingTaskId === task.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </main>
 
       {/* Notification Management Modal */}
       {showNotificationModal && selectedTask && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-start sticky top-0 bg-white">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Manage Notifications</h3>
-                <p className="text-sm text-gray-600 mt-1">{selectedTask.task_name}</p>
+                <h3 className="text-lg sm:text-lg font-semibold text-gray-900">Manage Notifications</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{selectedTask.task_name}</p>
               </div>
               <button
                 onClick={() => setShowNotificationModal(false)}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
+                className="text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0 ml-4"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-6">
               {loadingNotifications ? (
                 <p className="text-center text-gray-600">Loading...</p>
               ) : (
                 <>
                   {/* Current Notifications */}
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Active Notifications</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Active Notifications</h4>
                     {taskNotifications.length === 0 ? (
-                      <p className="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                      <p className="text-xs sm:text-sm text-gray-600 bg-gray-50 p-4 rounded-lg border border-gray-200">
                         No notifications configured for this task yet.
                       </p>
                     ) : (
@@ -523,20 +522,20 @@ export default function Dashboard() {
                         {taskNotifications.map((notif) => (
                           <div
                             key={notif.id}
-                            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                            className="flex items-start sm:items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors gap-3"
                           >
-                            <div className="flex items-center gap-3">
-                              <span className="text-xl">
+                            <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                              <span className="text-lg flex-shrink-0">
                                 {notif.user_integrations.integration_type === 'slack' ? '💬' : 
                                  notif.user_integrations.integration_type === 'email' ? '✉️' : 
                                  notif.user_integrations.integration_type === 'discord' ? '🎮' : '📱'}
                               </span>
-                              <div>
-                                <p className="font-medium text-gray-900">{notif.user_integrations.name}</p>
-                                <div className="mt-1 flex items-center gap-2">
+                              <div className="min-w-0 flex-1">
+                                <p className="font-medium text-gray-900 text-sm break-words">{notif.user_integrations.name}</p>
+                                <div className="mt-1 flex items-center gap-2 flex-wrap">
                                   {getNotificationBadge(notif.notify_on)}
                                   {notif.include_response && (
-                                    <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                    <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800 whitespace-nowrap">
                                       📝 With Response
                                     </span>
                                   )}
@@ -545,7 +544,7 @@ export default function Dashboard() {
                             </div>
                             <button
                               onClick={() => handleRemoveNotification(notif.id)}
-                              className="text-sm text-red-600 hover:text-red-900 transition-colors"
+                              className="text-xs sm:text-sm text-red-600 hover:text-red-900 transition-colors flex-shrink-0 whitespace-nowrap"
                             >
                               Remove
                             </button>
@@ -558,16 +557,16 @@ export default function Dashboard() {
                   {/* Add New Notification */}
                   {availableIntegrations.length > 0 ? (
                     <div className="border-t pt-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Add Notification</h4>
+                      <h4 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Add Notification</h4>
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                             Select Integration
                           </label>
                           <select
                             value={selectedIntegration}
                             onChange={(e) => setSelectedIntegration(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                            className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all text-sm"
                           >
                             <option value="">Choose an integration...</option>
                             {availableIntegrations
@@ -581,13 +580,13 @@ export default function Dashboard() {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                             Notify When
                           </label>
                           <select
                             value={notifyOn}
                             onChange={(e) => setNotifyOn(e.target.value as any)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                            className="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all text-sm"
                           >
                             <option value="always">Always (every execution)</option>
                             <option value="failure_only">Failure Only (status ≥ 400)</option>
@@ -598,16 +597,16 @@ export default function Dashboard() {
                           </p>
                         </div>
 
-                        <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-start space-x-3 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
                           <input
                             type="checkbox"
                             id="includeResponse"
                             checked={includeResponse}
                             onChange={(e) => setIncludeResponse(e.target.checked)}
-                            className="mt-1 h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+                            className="mt-1 h-4 w-4 text-black focus:ring-black border-gray-300 rounded flex-shrink-0"
                           />
                           <label htmlFor="includeResponse" className="flex-1 cursor-pointer">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-xs sm:text-sm font-medium text-gray-900">
                               Include API Response Body
                             </div>
                             <div className="text-xs text-gray-600 mt-1">
@@ -619,7 +618,7 @@ export default function Dashboard() {
                         <button
                           onClick={handleAddNotification}
                           disabled={!selectedIntegration}
-                          className="w-full px-4 py-3 bg-black text-white rounded-lg hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold transition-all duration-200"
+                          className="w-full px-4 py-2 sm:py-3 bg-black text-white rounded-lg hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold transition-all duration-200 text-sm"
                         >
                           Add Notification
                         </button>
@@ -627,7 +626,7 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <div className="border-t pt-6">
-                      <p className="text-sm text-gray-600 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                      <p className="text-xs sm:text-sm text-gray-600 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                         No integrations available. Please <Link href="/dashboard/settings" className="text-black font-semibold hover:underline">create an integration</Link> first.
                       </p>
                     </div>
