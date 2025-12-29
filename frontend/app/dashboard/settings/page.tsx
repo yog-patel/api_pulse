@@ -330,10 +330,9 @@ export default function Settings() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleTestIntegration(integration.id)}
-                          disabled={testingId === integration.id}
                           className="px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 disabled:opacity-50 transition-colors font-medium"
                         >
-                          {testingId === integration.id ? 'Testing...' : 'Test'}
+                          Test
                         </button>
                         <button
                           onClick={() => handleDeleteIntegration(integration.id)}
@@ -402,7 +401,7 @@ export default function Settings() {
                       key={type}
                       type="button"
                       onClick={() => {
-                        setSelectedType(type);
+                        setSelectedType(type as 'email' | 'slack' | 'discord' | 'webhook');
                         setFormData({ name: '', email: '', slackWebhook: '', discordWebhook: '', webhookUrl: '' });
                       }}
                       className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-colors ${
