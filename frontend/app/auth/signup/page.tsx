@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import Modal from '../../../components/Modal';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -16,6 +17,8 @@ export default function SignUp() {
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
   const router = useRouter();
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -27,6 +30,9 @@ export default function SignUp() {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
       });
 
       if (authError) {
@@ -49,9 +55,11 @@ export default function SignUp() {
           setLoading(false);
           return;
         }
-      }
 
-      router.push('/dashboard');
+        // Show verification modal
+        setVerificationEmail(email);
+        setShowVerificationModal(true);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setLoading(false);
@@ -60,6 +68,18 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Modal
+        isOpen={showVerificationModal}
+        title="Verify Your Email"
+        message={`We've sent a verification email to ${verificationEmail}. Please check your inbox and click the verification link to complete your signup. You'll be redirected to your dashboard once verified.`}
+        type="info"
+        onClose={() => {
+          setShowVerificationModal(false);
+          setEmail('');
+          setPassword('');
+          setFullName('');
+        }}
+      />
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center space-x-2 mb-6 group">
