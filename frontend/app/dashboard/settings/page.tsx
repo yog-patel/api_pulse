@@ -93,11 +93,39 @@ export default function Settings() {
         const data = await response.json();
         setIntegrations(data || []);
       } else {
-        console.error('Failed to fetch integrations');
-        setIntegrations([]);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to fetch integrations. Status:', response.status, 'Error:', errorData);
+        
+        if (response.status === 401) {
+          // Unauthorized - redirect to login
+          router.push('/auth/login');
+        } else if (response.status === 403) {
+          // Forbidden - permission issue
+          setAlertModal({ 
+            isOpen: true,
+            title: 'Permission Error',
+            message: 'You do not have permission to view integrations. Please contact support.',
+            type: 'error'
+          });
+          setIntegrations([]);
+        } else {
+          setAlertModal({ 
+            isOpen: true,
+            title: 'Error Loading Integrations',
+            message: 'Failed to load your integrations. Please refresh the page or try again later.',
+            type: 'error'
+          });
+          setIntegrations([]);
+        }
       }
     } catch (error) {
       console.error('Error fetching integrations:', error);
+      setAlertModal({ 
+        isOpen: true,
+        title: 'Connection Error',
+        message: 'Failed to connect to the server. Please check your internet connection and try again.',
+        type: 'error'
+      });
       setIntegrations([]);
     } finally {
       setLoading(false);

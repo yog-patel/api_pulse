@@ -88,11 +88,39 @@ export default function Dashboard() {
           const data = await response.json();
           setTasks(data || []);
         } else {
-          console.error('Failed to fetch tasks');
-          setTasks([]);
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Failed to fetch tasks. Status:', response.status, 'Error:', errorData);
+          
+          if (response.status === 401) {
+            // Unauthorized - redirect to login
+            router.push('/auth/login');
+          } else if (response.status === 403) {
+            // Forbidden - permission issue
+            setModal({ 
+              isOpen: true, 
+              title: 'Permission Error',
+              message: 'You do not have permission to view tasks. Please contact support.',
+              type: 'error'
+            });
+            setTasks([]);
+          } else {
+            setModal({ 
+              isOpen: true,
+              title: 'Error Loading Tasks',
+              message: 'Failed to load your tasks. Please refresh the page or try again later.',
+              type: 'error'
+            });
+            setTasks([]);
+          }
         }
       } catch (error) {
         console.error('Error fetching tasks:', error);
+        setModal({ 
+          isOpen: true,
+          title: 'Connection Error',
+          message: 'Failed to connect to the server. Please check your internet connection and try again.',
+          type: 'error'
+        });
         setTasks([]);
       } finally {
         setLoading(false);
@@ -103,8 +131,19 @@ export default function Dashboard() {
   }, [router]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
+    try {
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      // Clear session storage and redirect regardless
+      sessionStorage.clear();
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Use window.location for hard redirect to ensure logout
+      window.location.href = '/auth/login';
+    }
   };
 
   const handleDeleteTask = async (taskId: string) => {

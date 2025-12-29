@@ -21,10 +21,66 @@ export default function SignUp() {
   const [verificationEmail, setVerificationEmail] = useState('');
   const router = useRouter();
 
+  const getErrorMessage = (errorMessage: string): string => {
+    // Handle specific error cases with user-friendly messages
+    if (errorMessage.includes('User already registered')) {
+      return 'This email is already registered. Please sign in instead or use a different email.';
+    }
+    if (errorMessage.includes('duplicate key') || errorMessage.includes('unique constraint')) {
+      return 'An account with this email already exists. Please sign in or use a different email.';
+    }
+    if (errorMessage.includes('Password should be minimum')) {
+      return 'Password must be at least 6 characters long.';
+    }
+    if (errorMessage.includes('Invalid email')) {
+      return 'Please enter a valid email address.';
+    }
+    if (errorMessage.includes('Network')) {
+      return 'Network error. Please check your connection and try again.';
+    }
+    if (errorMessage.includes('timeout')) {
+      return 'Request timed out. Please try again.';
+    }
+    return errorMessage || 'An unexpected error occurred. Please try again.';
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Client-side validation
+    if (!fullName.trim()) {
+      setError('Please enter your full name.');
+      setLoading(false);
+      return;
+    }
+
+    if (!email.trim()) {
+      setError('Please enter your email address.');
+      setLoading(false);
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      setLoading(false);
+      return;
+    }
+
+    if (!password) {
+      setError('Please enter a password.');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -36,7 +92,7 @@ export default function SignUp() {
       });
 
       if (authError) {
-        setError(authError.message);
+        setError(getErrorMessage(authError.message));
         setLoading(false);
         return;
       }
@@ -51,7 +107,7 @@ export default function SignUp() {
         ]);
 
         if (profileError) {
-          setError(profileError.message);
+          setError(getErrorMessage(profileError.message));
           setLoading(false);
           return;
         }
@@ -61,7 +117,8 @@ export default function SignUp() {
         setShowVerificationModal(true);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(getErrorMessage(errorMsg));
       setLoading(false);
     }
   };
