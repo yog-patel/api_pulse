@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 import Modal from '../../../components/Modal';
+import OAuthButtons from '../../../components/OAuthButtons';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -212,6 +213,18 @@ export default function SignUp() {
               {loading ? 'Creating account...' : 'Create account'}
             </button>
           </form>
+
+          <div className="mt-6">
+            <div className="relative mb-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+              </div>
+            </div>
+            <OAuthButtons redirectUrl="/dashboard" />
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
