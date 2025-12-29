@@ -83,11 +83,14 @@ export default function SignUp() {
     }
 
     try {
+      // Determine the correct redirect URL based on environment
+      const redirectUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api-pulse.netlify.app';
+      
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${redirectUrl}/auth/callback`,
         },
       });
 
@@ -98,6 +101,12 @@ export default function SignUp() {
       }
 
       if (authData.user) {
+        // Show verification modal first
+        setVerificationEmail(email);
+        setShowVerificationModal(true);
+        setLoading(false);
+
+        // Insert profile in background
         const { error: profileError } = await supabase.from('profiles').insert([
           {
             id: authData.user.id,
@@ -107,14 +116,9 @@ export default function SignUp() {
         ]);
 
         if (profileError) {
-          setError(getErrorMessage(profileError.message));
-          setLoading(false);
-          return;
+          console.error('Profile creation error:', profileError);
+          // Don't block the user even if profile creation fails
         }
-
-        // Show verification modal
-        setVerificationEmail(email);
-        setShowVerificationModal(true);
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred';
