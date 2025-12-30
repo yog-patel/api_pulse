@@ -161,7 +161,7 @@ async function testSimpleMessage() {
   console.log('?? Sending simple test message to Discord...');
 
   const payload = {
-    content: '?? **API Pulse Discord Integration Test**\n\nIf you can see this message, your Discord webhook is working correctly!',
+    content: '🔔 **API Schedulr Discord Integration Test**\n\nIf you can see this message, your Discord webhook is working correctly!',
   };
 
   try {

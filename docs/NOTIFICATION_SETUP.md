@@ -154,7 +154,7 @@ Make sure these are set in your `.env` file for the scheduler:
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 RESEND_API_KEY=your_resend_api_key  # For email notifications
-FROM_EMAIL=notifications@apipulse.dev  # Your sender email
+FROM_EMAIL=notifications@api-schedulr.com  # Your sender email
 ```
 
 ---

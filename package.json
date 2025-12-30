@@ -1,7 +1,7 @@
 {
-  "name": "api-pulse",
+  "name": "api-schedulr",
   "version": "1.0.0",
-  "description": "API Pulse - Schedule automated HTTP requests to your API endpoints",
+  "description": "API Schedulr - Schedule automated HTTP requests to your API endpoints",
   "private": true,
   "scripts": {
     "frontend:install": "cd frontend && npm install",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/api-pulse.git"
+    "url": "https://github.com/yourusername/api-schedulr.git"
   },
   "keywords": [
     "api",

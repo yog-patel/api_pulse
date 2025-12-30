@@ -209,7 +209,7 @@ status: 400,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-  text: "?? API Pulse integration test successful! Your notifications are now active.",
+  text: "🔔 API Schedulr integration test successful! Your notifications are now active.",
      }),
   });
 
@@ -244,7 +244,7 @@ error: "Failed to test Slack webhook. Please verify the URL.",
     method: "POST",
      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-   content: "?? API Pulse integration test successful! Your Discord notifications are now active.",
+   content: "🔔 API Schedulr integration test successful! Your Discord notifications are now active.",
      }),
   });
 
@@ -280,7 +280,7 @@ error: "Failed to test Slack webhook. Please verify the URL.",
         try {
           const testPayload = {
             test: true,
-            message: "API Pulse webhook integration test successful! Your notifications are now active.",
+            message: "API Schedulr webhook integration test successful! Your notifications are now active.",
             timestamp: new Date().toISOString(),
           };
 
@@ -321,7 +321,7 @@ error: "Failed to test Slack webhook. Please verify the URL.",
       if (integration_type === "email") {
         try {
           const resendApiKey = Deno.env.get("RESEND_API_KEY");
-          const fromEmail = Deno.env.get("FROM_EMAIL") || "notifications@api-pulse.dev";
+          const fromEmail = Deno.env.get("FROM_EMAIL") || "notifications@api-schedulr.com";
 
           if (!resendApiKey) {
             console.error("RESEND_API_KEY not configured");
@@ -345,8 +345,8 @@ error: "Failed to test Slack webhook. Please verify the URL.",
             body: JSON.stringify({
               from: fromEmail,
               to: credentials.email,
-              subject: "API Pulse Email Integration Test",
-              html: `<h2>Welcome to API Pulse!</h2><p>This is a test email to confirm that your email notifications are working correctly.</p><p>You will receive notifications when your scheduled API tasks run.</p>`,
+              subject: "API Schedulr Email Integration Test",
+              html: `<h2>Welcome to API Schedulr!</h2><p>This is a test email to confirm that your email notifications are working correctly.</p><p>You will receive notifications when your scheduled API tasks run.</p>`,
             }),
           });
 

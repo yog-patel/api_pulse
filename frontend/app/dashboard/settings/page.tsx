@@ -274,7 +274,7 @@ export default function Settings() {
               <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold text-sm">AP</span>
               </div>
-              <span className="text-lg sm:text-xl font-semibold text-gray-900 hidden sm:inline">API Pulse</span>
+              <span className="text-lg sm:text-xl font-semibold text-gray-900 hidden sm:inline">API Schedulr</span>
             </Link>
             <div className="flex items-center space-x-3 sm:space-x-6">
               <span className="text-xs sm:text-sm text-gray-600 truncate max-w-xs">{user?.email}</span>

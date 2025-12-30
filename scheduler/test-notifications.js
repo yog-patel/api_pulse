@@ -8,7 +8,7 @@ require("dotenv").config();
  */
 
 async function testNotifications() {
-  console.log("?? Testing API Pulse Notification System\n");
+  console.log("🔔 Testing API Schedulr Notification System\n");
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

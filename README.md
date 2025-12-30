@@ -1,4 +1,4 @@
-# API Pulse
+# API Schedulr
 
 A web application for scheduling automated HTTP requests to API endpoints with real-time notifications.
 
@@ -61,7 +61,7 @@ A web application for scheduling automated HTTP requests to API endpoints with r
 ## Project Structure
 
 ```
-API_Pulse/
+api-schedulr/
 ├── frontend/   # Next.js frontend
 ├── supabase/functions/    # Supabase Edge Functions
 │   ├── create-task/       # Create new scheduled task
@@ -135,7 +135,7 @@ See the [response body guide](docs/INCLUDE_RESPONSE_FEATURE.md) for details.
 
 ## Payment & Subscription System
 
-API Pulse uses **Stripe** for secure payment processing and subscription management.
+API Schedulr uses **Stripe** for secure payment processing and subscription management.
 
 ### Pricing Plans
 

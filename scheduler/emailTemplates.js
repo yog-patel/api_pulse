@@ -1,5 +1,5 @@
 /**
- * Email Templates for API Pulse Notifications
+ * Email Templates for API Schedulr Notifications
  * Generates HTML email content for task execution notifications
  */
 
@@ -155,7 +155,7 @@ function generateSuccessEmail(task, log) {
     </div>
     
     <div class="footer">
-      <p>This is an automated notification from API Pulse</p>
+      <p>This is an automated notification from API Schedulr</p>
       <p style="font-size: 12px; color: #9ca3af;">
   You're receiving this because you have notifications enabled for this task
       </p>
@@ -333,7 +333,7 @@ function generateFailureEmail(task, log) {
     </div>
     
     <div class="footer">
- <p>This is an automated notification from API Pulse</p>
+ <p>This is an automated notification from API Schedulr</p>
   <p style="font-size: 12px; color: #9ca3af;">
         Please investigate this failure as soon as possible
       </p>

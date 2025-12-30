@@ -1,4 +1,4 @@
-# ?? API Pulse - Complete Setup Guide
+# 🚀 API Schedulr - Complete Setup Guide
 
 ## Table of Contents
 - [Quick Start](#quick-start)
@@ -19,8 +19,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/yog-patel/api_pulse.git
-cd api_pulse
+git clone https://github.com/yourusername/api-schedulr.git
+cd api-schedulr
 
 # Install frontend dependencies
 cd frontend
@@ -231,7 +231,7 @@ Optional feature to include API response in notifications:
 ## File Structure
 
 ```
-api_pulse/
+api-schedulr/
 ??? frontend/    # Next.js app
 ?   ??? app/   # Pages
 ?   ??? components/       # React components

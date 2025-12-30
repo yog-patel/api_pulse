@@ -84,7 +84,7 @@ Sending 2 notification(s) for task: Your Task
 ### **1. Check GitHub Actions Logs**
 
 After next run, check logs at:
-`https://github.com/yog-patel/api_pulse/actions`
+`https://github.com/yourusername/api-schedulr/actions`
 
 Look for:
 ```

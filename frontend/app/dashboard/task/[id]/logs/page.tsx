@@ -126,7 +126,7 @@ export default function TaskLogs({ params }: { params: { id: string } }) {
               <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg">
                 <span className="text-white font-bold text-sm">AP</span>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">API Pulse</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">API Schedulr</span>
             </Link>
           </div>
         </div>

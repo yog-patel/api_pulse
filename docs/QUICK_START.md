@@ -27,13 +27,13 @@ Get Slack notifications working in just a few steps!
 
 ### Windows:
 ```cmd
-cd C:\path\to\api_pulse
+cd C:\path\to\api-schedulr
 scripts\deploy-functions.bat
 ```
 
 ### Linux/Mac:
 ```bash
-cd /path/to/api_pulse
+cd /path/to/api-schedulr
 chmod +x scripts/deploy-functions.sh
 ./scripts/deploy-functions.sh
 ```

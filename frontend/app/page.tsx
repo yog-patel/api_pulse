@@ -118,7 +118,7 @@ export default function Home() {
               <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg flex-shrink-0">
                 <span className="text-white font-bold text-sm">AP</span>
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent hidden sm:inline">API Pulse</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent hidden sm:inline">API Schedulr</span>
             </Link>
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-sm text-gray-700 hover:text-purple-600 font-medium transition-colors">Features</a>
@@ -630,12 +630,12 @@ export default function Home() {
             {/* FAQ Item 1 */}
             <details className="group bg-white rounded-xl p-4 sm:p-6 border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer">
               <summary className="font-semibold text-gray-900 flex justify-between items-center select-none text-base sm:text-lg">
-                What is API Pulse and how does it work?
+                What is API Schedulr and how does it work?
                 <span className="text-2xl text-purple-500 group-open:rotate-45 transition-transform duration-300 flex-shrink-0 ml-2">+</span>
               </summary>
               <div className="text-gray-600 mt-3 sm:mt-4 leading-relaxed space-y-3 text-sm sm:text-base">
                 <p>
-                  API Pulse is a serverless API monitoring and scheduling service. You simply add your API endpoint URL, set a schedule (how often to check it), and we automatically make HTTP requests to your API at the specified intervals.
+                  API Schedulr is a serverless API monitoring and scheduling service. You simply add your API endpoint URL, set a schedule (how often to check it), and we automatically make HTTP requests to your API at the specified intervals.
                 </p>
                 <p>
                   Each execution is logged with response status, timing, and error details. You can receive notifications via Slack, Discord, Email (Pro), or custom webhooks when your API succeeds or fails.
@@ -768,7 +768,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
             <div>
-              <h4 className="font-bold text-white mb-4">API Pulse</h4>
+              <h4 className="font-bold text-white mb-4">API Schedulr</h4>
               <p className="text-sm">Schedule and monitor API calls automatically.</p>
             </div>
             <div>
@@ -795,7 +795,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-sm text-center">
-            <p>&copy; 2025 API Pulse. All rights reserved.</p>
+            <p>&copy; 2025 API Schedulr. All rights reserved.</p>
           </div>
         </div>
       </footer>

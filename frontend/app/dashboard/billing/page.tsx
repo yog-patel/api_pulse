@@ -152,7 +152,7 @@ export default function Billing() {
               <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">AP</span>
               </div>
-              <span className="text-xl font-semibold text-gray-900">API Pulse</span>
+              <span className="text-xl font-semibold text-gray-900">API Schedulr</span>
             </Link>
             <div className="flex items-center space-x-6">
               <Link

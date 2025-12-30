@@ -12,7 +12,7 @@ class NotificationService {
     
     // Store Resend configuration for email notifications
     this.resendApiKey = process.env.RESEND_API_KEY;
-    this.fromEmail = process.env.FROM_EMAIL || 'notifications@apipulse.dev';
+    this.fromEmail = process.env.FROM_EMAIL || 'notifications@api-schedulr.com';
   }
 
   /**

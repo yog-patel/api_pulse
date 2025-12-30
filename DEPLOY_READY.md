@@ -57,7 +57,7 @@ This adds:
 
 ### Step 3: Set GitHub Secrets (if not already done)
 
-Go to: `https://github.com/yog-patel/api_pulse/settings/secrets/actions`
+Go to: `https://github.com/yourusername/api-schedulr/settings/secrets/actions`
 
 Add these secrets:
 ```
@@ -117,7 +117,7 @@ supabase functions deploy link-task-notification
 ## ?? Current File Structure
 
 ```
-api_pulse/
+api-schedulr/
 ??? docs/          # 9 organized docs (was 13)
 ?   ??? SETUP_GUIDE.md     # ?? Main setup guide
 ?   ??? EMAIL_SETUP_GUIDE.md

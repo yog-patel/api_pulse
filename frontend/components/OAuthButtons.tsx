@@ -18,7 +18,7 @@ export default function OAuthButtons({ redirectUrl = '/dashboard' }: OAuthButton
   const handleOAuthSignIn = async (provider: 'google' | 'github' | 'discord') => {
     setLoading(provider);
     try {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api-pulse.netlify.app';
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api-schedulr.com';
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {

@@ -267,7 +267,7 @@ Result: Transparent API status for clients
 RESEND_API_KEY=re_your_key_here
 
 # Optional (defaults shown)
-FROM_EMAIL=notifications@apipulse.dev
+FROM_EMAIL=notifications@api-schedulr.com
 ```
 
 ### Per-Integration Settings

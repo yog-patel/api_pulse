@@ -388,7 +388,7 @@ export default function Dashboard() {
               <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg flex-shrink-0">
                 <span className="text-white font-bold text-sm">AP</span>
               </div>
-              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent hidden sm:inline">API Pulse</span>
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent hidden sm:inline">API Schedulr</span>
             </Link>
             <div className="flex items-center space-x-3 sm:space-x-6">
               <span className="text-xs sm:text-sm text-gray-700 font-medium truncate max-w-xs">{user?.email}</span>

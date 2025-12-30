@@ -1,6 +1,6 @@
-# API Pulse - Notification API Examples
+# API Schedulr - Notification API Examples
 
-This file contains example API calls for managing notifications in API Pulse.
+This file contains example API calls for managing notifications in API Schedulr.
 
 ## Prerequisites
 

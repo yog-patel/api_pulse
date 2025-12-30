@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sign Up - API Pulse",
+  title: "Sign Up - API Schedulr",
 };
 
 export default function AuthLayout({

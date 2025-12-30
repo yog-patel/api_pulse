@@ -1,5 +1,5 @@
 /**
- * API Pulse Pricing Plans Configuration
+ * API Schedulr Pricing Plans Configuration
  * 
  * Defines the limits and features for each subscription tier
  */

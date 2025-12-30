@@ -363,7 +363,7 @@ async function sendEmailNotification(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: Deno.env.get("FROM_EMAIL") || "notifications@apipulse.dev",
+      from: Deno.env.get("FROM_EMAIL") || "notifications@api-schedulr.com",
       to: recipientEmail,
       subject: subject,
       html: htmlContent,

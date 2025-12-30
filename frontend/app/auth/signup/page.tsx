@@ -83,7 +83,7 @@ export default function SignUp() {
 
     try {
       // Determine the correct redirect URL based on environment
-      const redirectUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api-pulse.netlify.app';
+      const redirectUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api-schedulr.com';
       
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -146,10 +146,10 @@ export default function SignUp() {
             <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-lg">
               <span className="text-white font-bold text-sm">AP</span>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">API Pulse</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">API Schedulr</span>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Create your account</h2>
-          <p className="text-gray-600">Get started with API Pulse today</p>
+          <p className="text-gray-600">Get started with API Schedulr today</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
