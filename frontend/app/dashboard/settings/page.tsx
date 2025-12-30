@@ -189,10 +189,6 @@ export default function Settings() {
     }
   };
 
-  const handleTestIntegration = async (_integrationId: string) => {
-    setAlertModal({ isOpen: true, message: 'Slack integrations are automatically tested when you add them. Check your channel for the test message!', type: 'info', title: 'Info' });
-  };
-
   const handleDeleteIntegration = async (integrationId: string) => {
     setConfirmModal({
       isOpen: true,
