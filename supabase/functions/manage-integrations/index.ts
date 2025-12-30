@@ -317,6 +317,68 @@ error: "Failed to test Slack webhook. Please verify the URL.",
         }
       }
 
+      // Test the integration before saving (for Email)
+      if (integration_type === "email") {
+        try {
+          const resendApiKey = Deno.env.get("RESEND_API_KEY");
+          const fromEmail = Deno.env.get("FROM_EMAIL") || "notifications@api-pulse.dev";
+
+          if (!resendApiKey) {
+            console.error("RESEND_API_KEY not configured");
+            return new Response(
+              JSON.stringify({
+                error: "Email service is not configured. Please contact support.",
+              }),
+              {
+                status: 500,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              }
+            );
+          }
+
+          const testResponse = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${resendApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: fromEmail,
+              to: credentials.email,
+              subject: "API Pulse Email Integration Test",
+              html: `<h2>Welcome to API Pulse!</h2><p>This is a test email to confirm that your email notifications are working correctly.</p><p>You will receive notifications when your scheduled API tasks run.</p>`,
+            }),
+          });
+
+          if (!testResponse.ok) {
+            const errorText = await testResponse.text();
+            console.error("Email test failed:", testResponse.status, errorText);
+            return new Response(
+              JSON.stringify({
+                error: `Failed to send test email. Please verify the email address and try again.`,
+              }),
+              {
+                status: 400,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              }
+            );
+          }
+
+          console.log("✓ Test email sent successfully to:", credentials.email);
+        } catch (error) {
+          console.error("Email test error:", error);
+          return new Response(
+            JSON.stringify({
+              error: `Failed to test email: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+            }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+      }
+
       // Insert integration
       const { data: integration, error } = await supabase
         .from("user_integrations")

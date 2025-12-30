@@ -357,12 +357,6 @@ export default function Settings() {
 
                       <div className="flex gap-2 w-full sm:w-auto">
                         <button
-                          onClick={() => handleTestIntegration(integration.id)}
-                          className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 disabled:opacity-50 transition-colors font-medium"
-                        >
-                          Test
-                        </button>
-                        <button
                           onClick={() => handleDeleteIntegration(integration.id)}
                           disabled={deletingId === integration.id}
                           className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors font-medium"
