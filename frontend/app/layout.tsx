@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "API Pulse - Schedule Your API Calls",
   description: "Simple web application to schedule automated HTTP requests to your API endpoints",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
