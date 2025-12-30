@@ -18,9 +18,15 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY")!;
 
+    console.log("=== Stripe Checkout Session Request ===");
+    console.log("Supabase URL configured:", !!supabaseUrl);
+    console.log("Supabase Key configured:", !!supabaseKey);
+    console.log("Stripe Secret Key configured:", !!stripeSecretKey);
+
     if (!stripeSecretKey) {
+      console.error("STRIPE_SECRET_KEY not configured");
       return new Response(
-        JSON.stringify({ error: "Stripe secret key not configured" }),
+        JSON.stringify({ error: "Stripe secret key not configured. Please add STRIPE_SECRET_KEY to Netlify environment variables." }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -76,6 +82,7 @@ serve(async (req) => {
     let customerId = profile?.stripe_customer_id;
 
     if (!customerId) {
+      console.log("Creating new Stripe customer for user:", user.id);
       // Create Stripe customer
       const customerResponse = await fetch("https://api.stripe.com/v1/customers", {
         method: "POST",
@@ -91,8 +98,9 @@ serve(async (req) => {
 
       if (!customerResponse.ok) {
         const error = await customerResponse.text();
+        console.error("Stripe customer creation failed:", error);
         return new Response(
-          JSON.stringify({ error: "Failed to create Stripe customer" }),
+          JSON.stringify({ error: `Failed to create Stripe customer: ${error}` }),
           {
             status: 500,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -134,9 +142,16 @@ serve(async (req) => {
 
     if (!sessionResponse.ok) {
       const error = await sessionResponse.text();
-      console.error("Stripe checkout error:", error);
+      console.error("Stripe checkout error status:", sessionResponse.status);
+      console.error("Stripe checkout error response:", error);
+      console.error("Request body was:", {
+        customer: customerId,
+        mode: "subscription",
+        priceId,
+        planId,
+      });
       return new Response(
-        JSON.stringify({ error: "Failed to create checkout session" }),
+        JSON.stringify({ error: `Failed to create checkout session: ${error}` }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
