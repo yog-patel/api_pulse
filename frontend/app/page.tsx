@@ -171,8 +171,9 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed">
-              Automate your API monitoring with scheduled HTTP requests. Get instant notifications via Slack, Discord, or Email when your APIs fail or succeed. 
-              <span className="font-semibold text-gray-900"> No servers, no cron, no DevOps.</span>
+              Automate API checks and background jobs with scheduled HTTP requests.
+              <br />
+              <span className="font-semibold text-gray-900">Get instant alerts in Slack, Discord, or Email — no servers, no cron, no DevOps.</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
               <Link 
