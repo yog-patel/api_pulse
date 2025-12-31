@@ -8,7 +8,7 @@
     <priority>1.0</priority>
   </url>
 
-  <!-- Authentication Pages -->
+  <!-- Authentication Pages (Public Access) -->
   <url>
     <loc>https://www.api-schedulr.com/auth/login</loc>
     <lastmod>2025-12-30</lastmod>
@@ -23,35 +23,6 @@
     <priority>0.9</priority>
   </url>
 
-  <!-- Public Dashboard -->
-  <url>
-    <loc>https://www.api-schedulr.com/dashboard</loc>
-    <lastmod>2025-12-30</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Billing/Plans -->
-  <url>
-    <loc>https://www.api-schedulr.com/dashboard/billing</loc>
-    <lastmod>2025-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Create Task -->
-  <url>
-    <loc>https://www.api-schedulr.com/dashboard/create-task</loc>
-    <lastmod>2025-12-30</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Settings -->
-  <url>
-    <loc>https://www.api-schedulr.com/dashboard/settings</loc>
-    <lastmod>2025-12-30</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  <!-- Note: Dashboard, Settings, Billing, and Create-task pages are excluded 
+       because they require authentication and Google crawlers cannot access them -->
 </urlset>
