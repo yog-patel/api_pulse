@@ -17,7 +17,7 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get the current session (which should be set after email verification)
+        // Get the current session (which should be set after email verification or OAuth)
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError) {
@@ -27,7 +27,32 @@ export default function AuthCallback() {
         }
 
         if (session) {
-          // Email verified successfully, redirect to dashboard
+          // Check if profile exists for this user
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+
+          // If profile doesn't exist, create it (handles OAuth users)
+          if (profileError || !profile) {
+            const { error: createError } = await supabase
+              .from('profiles')
+              .insert([
+                {
+                  id: session.user.id,
+                  email: session.user.email,
+                  full_name: session.user.user_metadata?.full_name || '',
+                },
+              ]);
+
+            if (createError) {
+              console.error('Error creating profile:', createError);
+              // Continue anyway - the profile may have been created concurrently
+            }
+          }
+
+          // Email verified or OAuth success - redirect to dashboard
           router.push('/dashboard');
         } else {
           setError('Email verification failed. Please try signing up again.');

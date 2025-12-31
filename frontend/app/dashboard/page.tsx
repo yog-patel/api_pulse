@@ -72,6 +72,34 @@ export default function Dashboard() {
 
       setUser(session.user);
 
+      // Ensure profile exists (handles OAuth users and race conditions)
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError || !profile) {
+          // Profile doesn't exist, create it
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert([
+              {
+                id: session.user.id,
+                email: session.user.email,
+                full_name: session.user.user_metadata?.full_name || '',
+              },
+            ]);
+
+          if (createError) {
+            console.error('Error creating profile:', createError);
+          }
+        }
+      } catch (err) {
+        console.error('Error checking/creating profile:', err);
+      }
+
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/list-tasks`,
