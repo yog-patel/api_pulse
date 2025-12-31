@@ -1,0 +1,20 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Specific rules for common search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Disallow private/admin pages if any
+Disallow: /admin
+Disallow: /private
+
+# Sitemap (add when you have one)
+Sitemap: https://www.api-schedulr.com/sitemap.xml
